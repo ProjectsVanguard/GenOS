@@ -7,6 +7,12 @@ on:
       - 'boot/**'
       - 'build-iso.sh'
       - 'Makefile'
+  pull_request:
+    paths:
+      - 'kernel/**'
+      - 'Makefile'
+      - 'boot/**'
+      - 'build-iso.sh'
   workflow_dispatch:
 
 permissions:
