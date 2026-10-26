@@ -1,0 +1,71 @@
+name: Publish mandatory GenOS kernel security update (no ISO)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'kernel/**'
+      - 'Makefile'
+      - '.github/workflows/publish-security-update.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-kernel-update:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Compile and inspect kernel
+        run: |
+          set -Eeuo pipefail
+          make clean build/kernel.elf
+          file build/kernel.elf
+          readelf -h build/kernel.elf
+          test -s build/kernel.elf
+
+      - name: Package kernel-only update (no ISO)
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p dist/payload/boot
+          install -m 0644 build/kernel.elf dist/payload/boot/kernel.elf
+          cat > dist/payload/update-manifest.json <<EOF
+          {
+            "product": "GenOS GenKernel",
+            "channel": "security",
+            "version": "kernel-security-${GITHUB_RUN_NUMBER}",
+            "commit": "${GITHUB_SHA}",
+            "mandatory": true,
+            "update_policy": "required",
+            "requires_reboot": true,
+            "payload": "boot/kernel.elf",
+            "contains_iso": false,
+            "security_fixes": [
+              "Validate framebuffer address, 32-bit pixel format, dimensions and pitch before rendering",
+              "Reject zero or oversized dimensions and inconsistent row pitch"
+            ],
+            "notice": "OBRIGATORIA: faça backup, verifique o SHA-256 e instale o kernel atualizado. Este manifesto não é aplicado automaticamente pelo GenOS."
+          }
+          EOF
+          cd dist/payload
+          sha256sum boot/kernel.elf update-manifest.json > ../SHA256SUMS.txt
+          zip -qr ../GenOS-Kernel-Security-Update.zip boot/kernel.elf update-manifest.json
+          cd ..
+          sha256sum GenOS-Kernel-Security-Update.zip > GenOS-Kernel-Security-Update.zip.sha256
+          ls -lh
+
+      - name: Upload mandatory kernel update artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GenOS-Kernel-Security-Update-${{ github.run_number }}
+          path: |
+            dist/GenOS-Kernel-Security-Update.zip
+            dist/GenOS-Kernel-Security-Update.zip.sha256
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 90
