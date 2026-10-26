@@ -38,13 +38,16 @@ jobs:
           tar -xzf /tmp/limine-binary.tar.gz -C /tmp/limine-dist
           limine_bin="$(find /tmp/limine-dist -type f -name limine -perm /111 -print -quit)"
           bios_sys="$(find /tmp/limine-dist -type f -name limine-bios.sys -print -quit)"
-          efi_bin="$(find /tmp/limine-dist -type f -name BOOTX64.EFI -print -quit)"
+          bios_cd="$(find /tmp/limine-dist -type f -name limine-bios-cd.bin -print -quit)"
+          uefi_cd="$(find /tmp/limine-dist -type f -name limine-uefi-cd.bin -print -quit)"
           test -n "$limine_bin"
           test -n "$bios_sys"
-          test -n "$efi_bin"
+          test -n "$bios_cd"
+          test -n "$uefi_cd"
           install -m 0755 "$limine_bin" boot/limine/limine
           install -m 0644 "$bios_sys" boot/limine/limine-bios.sys
-          install -m 0644 "$efi_bin" boot/limine/BOOTX64.EFI
+          install -m 0644 "$bios_cd" boot/limine/limine-bios-cd.bin
+          install -m 0644 "$uefi_cd" boot/limine/limine-uefi-cd.bin
           boot/limine/limine --version
 
       - name: Compile kernel and run package tests
@@ -58,7 +61,6 @@ jobs:
           set -Eeuo pipefail
           test -s build/GenOS-Genesis-x86_64.iso
           test -s build/SHA256SUMS.txt
-          file build/GenOS-Genesis-x86_64.iso
           sha256sum --check build/SHA256SUMS.txt
 
       - name: Upload test ISO
