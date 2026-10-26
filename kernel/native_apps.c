@@ -43,7 +43,7 @@ void genos_native_apps_render(const genos_native_ui *u, unsigned selected, unsig
             u->text(48,94,"RAM BUFFER ONLY - NOT SAVED TO DISK",accent,1);
             for (unsigned i=0;i<note_len;i+=70) {
                 char line[71]; unsigned n=note_len-i; if(n>70)n=70;
-                for(unsigned j=0;j<n;j++) line[j]=note[i+j]; line[n]=0;
+                for(unsigned j=0;j<n;j++) { line[j]=note[i+j]; }\n                line[n]=0;
                 u->text(48,124+(int)(i/70)*18,line,fg,1);
                 if(i>=490) break;
             }
