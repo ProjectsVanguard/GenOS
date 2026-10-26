@@ -61,63 +61,38 @@ jobs:
       - name: Build hybrid BIOS/UEFI ISO
         run: ./build-iso.sh
 
-      - name: Smoke-test BIOS boot in QEMU and verify desktop
+      - name: Smoke-test BIOS boot in QEMU and verify kernel
         shell: bash
         run: |
           set -Eeuo pipefail
-          rm -f /tmp/genos-qemu-monitor /tmp/genos-qmp.sock /tmp/genos-boot.ppm /tmp/genos-boot.txt /tmp/genos-serial.log
+          rm -f /tmp/genos-serial.log /tmp/genos-qemu.log
           xvfb-run -a qemu-system-x86_64 \
             -machine pc -m 512M \
             -cdrom build/GenOS-Genesis-x86_64.iso -boot d \
-            -qmp unix:/tmp/genos-qmp.sock,server=on,wait=off \
-            -serial file:/tmp/genos-serial.log -display sdl -no-reboot -no-shutdown \
+            -serial file:/tmp/genos-serial.log \
+            -display none -no-reboot -no-shutdown \
             >/tmp/genos-qemu.log 2>&1 &
           qemu_pid=$!
           cleanup() { kill "$qemu_pid" 2>/dev/null || true; }
           trap cleanup EXIT
-          python3 - <<'PY'
-          import json, socket, time
-          path = "/tmp/genos-qmp.sock"
-          deadline = time.time() + 15
-          sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-          while time.time() < deadline:
-              try:
-                  sock.connect(path)
-                  break
-              except OSError:
-                  time.sleep(0.25)
-          else:
-              raise SystemExit("QEMU QMP socket did not start")
-          sock.settimeout(30)
-          stream = sock.makefile("rwb", buffering=0)
-          greeting = json.loads(stream.readline().decode())
-          if "QMP" not in greeting:
-              raise SystemExit(f"Unexpected QMP greeting: {greeting}")
-          def qmp(command, arguments=None):
-              request = {"execute": command}
-              if arguments is not None:
-                  request["arguments"] = arguments
-              stream.write((json.dumps(request) + "\r\n").encode())
-              while True:
-                  response = json.loads(stream.readline().decode())
-                  if "return" in response:
-                      return response["return"]
-                  if "error" in response:
-                      raise RuntimeError(f"QMP {command} failed: {response['error']}")
-          qmp("qmp_capabilities")
-          # QMP executes monitor commands directly; no terminal line editing involved.
-          time.sleep(20)
-          qmp("human-monitor-command", {"command-line": "screendump /tmp/genos-boot.ppm"})
-          sock.close()
-          PY
-          test -s /tmp/genos-boot.ppm
-          tesseract /tmp/genos-boot.ppm /tmp/genos-boot 2>/dev/null
-          cat /tmp/genos-boot.txt
-          grep -q "GENKERNEL BOOTED" /tmp/genos-boot.txt || {
-            echo "::error::GenKernel did not report successful boot on the serial console"
-            cat /tmp/genos-qemu.log
-            exit 1
-          }
+          # Limine's configured timeout boots the sole entry automatically.
+          for attempt in $(seq 1 30); do
+            if grep -q "GENKERNEL BOOTED" /tmp/genos-serial.log 2>/dev/null; then
+              cat /tmp/genos-serial.log
+              exit 0
+            fi
+            if ! kill -0 "$qemu_pid" 2>/dev/null; then
+              echo "::error::QEMU exited before GenKernel boot marker"
+              cat /tmp/genos-qemu.log
+              cat /tmp/genos-serial.log 2>/dev/null || true
+              exit 1
+            fi
+            sleep 1
+          done
+          echo "::error::GenKernel boot marker not detected on serial console"
+          cat /tmp/genos-qemu.log
+          cat /tmp/genos-serial.log 2>/dev/null || true
+          exit 1
 
       - name: Check ISO and checksum
         run: |
