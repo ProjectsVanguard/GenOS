@@ -1,4 +1,5 @@
 CC ?= gcc
+.DEFAULT_GOAL := all
 CFLAGS = -std=c11 -O2 -Wall -Wextra -Werror -ffreestanding -fno-stack-protector -fno-pic -fno-pie -m64 -mno-red-zone -mcmodel=kernel -fno-asynchronous-unwind-tables -fno-unwind-tables
 LDFLAGS = -nostdlib -static -no-pie -Wl,-T,kernel/linker.ld -Wl,--build-id=none
 .PHONY: all clean test gem suite-gem FORCE
