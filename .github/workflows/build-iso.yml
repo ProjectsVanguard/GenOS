@@ -97,7 +97,7 @@ jobs:
               request = {"execute": command}
               if arguments is not None:
                   request["arguments"] = arguments
-              stream.write((json.dumps(request) + "\\r\\n").encode())
+              stream.write((json.dumps(request) + "\r\n").encode())
               while True:
                   response = json.loads(stream.readline().decode())
                   if "return" in response:
