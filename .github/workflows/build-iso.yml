@@ -39,6 +39,11 @@ jobs:
           echo "Files in official Limine archive:"
           find /tmp/limine-dist -maxdepth 4 -type f -print | sort
           limine_bin="$(find /tmp/limine-dist -type f -name limine -print -quit)"
+          if [ -z "$limine_bin" ]; then
+            echo "Limine archive ships limine.c and Makefile, but not a prebuilt Linux CLI; compiling it now."
+            make -C /tmp/limine-dist/limine-binary
+            limine_bin="$(find /tmp/limine-dist -type f -name limine -print -quit)"
+          fi
           bios_sys="$(find /tmp/limine-dist -type f -name limine-bios.sys -print -quit)"
           bios_cd="$(find /tmp/limine-dist -type f -name limine-bios-cd.bin -print -quit)"
           uefi_cd="$(find /tmp/limine-dist -type f -name limine-uefi-cd.bin -print -quit)"
