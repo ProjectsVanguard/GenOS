@@ -5,11 +5,9 @@ on:
   push:
     branches: [main]
     paths:
-      - 'kernel/**'
       - 'boot/**'
       - 'build-iso.sh'
       - 'Makefile'
-      - '.github/workflows/build-editions.yml'
 
 permissions:
   contents: write
