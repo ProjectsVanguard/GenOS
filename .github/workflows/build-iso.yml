@@ -4,11 +4,9 @@ on:
   push:
     branches: [main]
     paths:
-      - 'kernel/**'
       - 'boot/**'
       - 'build-iso.sh'
       - 'Makefile'
-      - '.github/workflows/build-iso.yml'
   workflow_dispatch:
 
 permissions:
