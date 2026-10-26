@@ -69,5 +69,5 @@ Ainda faltam componentes fundamentais de um sistema operacional de uso geral, in
 A seção abaixo é atualizada automaticamente pelo GitHub Actions quando alterações relevantes são enviadas para `main`. Para mudanças funcionais, atualize também manualmente as seções de estado, build e limitações, para que a documentação descreva o comportamento real — não apenas a existência de um commit.
 
 <!-- README-AUTO-UPDATE:START -->
-- Última atualização automática: aguardando a primeira execução após a integração do workflow.
+- Última atualização automática: 2026-10-26T20:07:00-03:00 UTC — commit [`dc1c55f`](https://github.com/ProjectsVanguard/GenOS/commit/dc1c55faea83b153804673198f7ebd3dff0d4bf4) — ci: add tested ISO v2 builds for current and legacy editions
 <!-- README-AUTO-UPDATE:END -->
