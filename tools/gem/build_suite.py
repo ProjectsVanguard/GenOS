@@ -38,7 +38,7 @@ def main():
         stage = pathlib.Path(tmp)
         shutil.copytree(apps, stage / "apps")
         (stage / "manifest.json").write_text(
-            json.dumps(MANIFEST, ensure_ascii=False, indent=2) + "\\n",
+            json.dumps(MANIFEST, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
         )
         genpkg.pack(stage, output)
