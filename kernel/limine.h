@@ -1,7 +1,8 @@
 #ifndef GENOS_LIMINE_H
 #define GENOS_LIMINE_H
 #include <stdint.h>
-#define LIMINE_BASE_REVISION(N) uint64_t limine_base_revision[3] = {0xf9562b2d5c95a6c8ULL, 0x6a7b384944536bdcULL, (N)}
+/* Keep the base-revision declaration in the discoverable Limine request section. */
+#define LIMINE_BASE_REVISION(N) __attribute__((used, section(".limine_requests"))) static volatile uint64_t limine_base_revision[3] = {0xf9562b2d5c95a6c8ULL, 0x6a7b384944536bdcULL, (N)}
 #define LIMINE_BASE_REVISION_SUPPORTED (limine_base_revision[2] == 0)
 #define LIMINE_REQUESTS_START_MARKER __attribute__((used, section(".limine_requests_start"))) static volatile uint64_t limine_requests_start_marker[4] = {0xf6b8f4b39de7d1aeULL, 0xfab91a6940fcb9cfULL, 0x785c6ed015d3e316ULL, 0x181e920a7852b9d9ULL}
 #define LIMINE_REQUESTS_END_MARKER __attribute__((used, section(".limine_requests_end"))) static volatile uint64_t limine_requests_end_marker[2] = {0xadc0e0531bb10d03ULL, 0x9572709f31764c62ULL}

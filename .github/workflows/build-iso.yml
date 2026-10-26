@@ -1,0 +1,72 @@
+name: Build GenOS test ISO
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'kernel/**'
+      - 'boot/**'
+      - 'build-iso.sh'
+      - 'Makefile'
+      - '.github/workflows/build-iso.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-iso:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential binutils xorriso python3 file curl ca-certificates
+
+      - name: Download official Limine binary release
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p /tmp/limine-dist boot/limine
+          curl --fail --location --retry 3 \
+            https://github.com/Limine-Bootloader/Limine/releases/latest/download/limine-binary.tar.gz \
+            --output /tmp/limine-binary.tar.gz
+          tar -xzf /tmp/limine-binary.tar.gz -C /tmp/limine-dist
+          limine_bin="$(find /tmp/limine-dist -type f -name limine -perm /111 -print -quit)"
+          bios_sys="$(find /tmp/limine-dist -type f -name limine-bios.sys -print -quit)"
+          efi_bin="$(find /tmp/limine-dist -type f -name BOOTX64.EFI -print -quit)"
+          test -n "$limine_bin"
+          test -n "$bios_sys"
+          test -n "$efi_bin"
+          install -m 0755 "$limine_bin" boot/limine/limine
+          install -m 0644 "$bios_sys" boot/limine/limine-bios.sys
+          install -m 0644 "$efi_bin" boot/limine/BOOTX64.EFI
+          boot/limine/limine --version
+
+      - name: Compile kernel and run package tests
+        run: make clean test
+
+      - name: Build hybrid BIOS/UEFI ISO
+        run: ./build-iso.sh
+
+      - name: Check ISO and checksum
+        run: |
+          set -Eeuo pipefail
+          test -s build/GenOS-Genesis-x86_64.iso
+          test -s build/SHA256SUMS.txt
+          file build/GenOS-Genesis-x86_64.iso
+          sha256sum --check build/SHA256SUMS.txt
+
+      - name: Upload test ISO
+        uses: actions/upload-artifact@v4
+        with:
+          name: GenOS-Genesis-x86_64-ISO
+          path: |
+            build/GenOS-Genesis-x86_64.iso
+            build/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 30
