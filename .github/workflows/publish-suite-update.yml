@@ -7,6 +7,7 @@ on:
       - 'apps/**'
       - 'tools/gem/**'
       - 'Makefile'
+      - 'tests/test_gem.sh'
       - 'tools/apply-suite-update.sh'
       - '.github/workflows/publish-suite-update.yml'
   workflow_dispatch:
@@ -21,6 +22,10 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
+
+      - name: Test unified .gem package
+        shell: bash
+        run: bash tests/test_gem.sh
 
       - name: Build update bundle
         shell: bash
