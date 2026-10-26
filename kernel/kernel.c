@@ -31,13 +31,13 @@ static unsigned keyboard_key(uint8_t sc){
     if(sc==0x01)return 259; if(sc==0x0e)return 260;
     if(sc>=0x02&&sc<=0x0b){static const char d[]="1234567890";return (unsigned)d[sc-0x02];}
     if(sc==0x0c)return '-'; if(sc==0x0d)return '=';
-    if(sc==0x10)return 'q'; if(sc==0x11)return 'w'; if(sc==0x12)return 'e';
-    if(sc==0x13)return 'r'; if(sc==0x14)return 't'; if(sc==0x15)return 'y';
-    if(sc==0x16)return 'u'; if(sc==0x17)return 'i'; if(sc==0x18)return 'o'; if(sc==0x19)return 'p';
-    if(sc==0x1e)return 'a'; if(sc==0x1f)return 's'; if(sc==0x20)return 'd'; if(sc==0x21)return 'f';
-    if(sc==0x22)return 'g'; if(sc==0x23)return 'h'; if(sc==0x24)return 'j'; if(sc==0x25)return 'k'; if(sc==0x26)return 'l';
-    if(sc==0x2c)return 'z'; if(sc==0x2d)return 'x'; if(sc==0x2e)return 'c'; if(sc==0x2f)return 'v';
-    if(sc==0x30)return 'b'; if(sc==0x31)return 'n'; if(sc==0x32)return 'm';
+    if(sc==0x10)return 'Q'; if(sc==0x11)return 'W'; if(sc==0x12)return 'E';
+    if(sc==0x13)return 'R'; if(sc==0x14)return 'T'; if(sc==0x15)return 'Y';
+    if(sc==0x16)return 'U'; if(sc==0x17)return 'I'; if(sc==0x18)return 'O'; if(sc==0x19)return 'P';
+    if(sc==0x1e)return 'A'; if(sc==0x1f)return 'S'; if(sc==0x20)return 'D'; if(sc==0x21)return 'F';
+    if(sc==0x22)return 'G'; if(sc==0x23)return 'H'; if(sc==0x24)return 'J'; if(sc==0x25)return 'K'; if(sc==0x26)return 'L';
+    if(sc==0x2c)return 'Z'; if(sc==0x2d)return 'X'; if(sc==0x2e)return 'C'; if(sc==0x2f)return 'V';
+    if(sc==0x30)return 'B'; if(sc==0x31)return 'N'; if(sc==0x32)return 'M';
     if(sc==0x33)return ','; if(sc==0x34)return '.'; if(sc==0x35)return '/'; if(sc==0x39)return ' ';
     return 0;
 }
