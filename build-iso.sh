@@ -7,9 +7,9 @@ for f in boot/limine/limine boot/limine/limine-bios.sys boot/limine/limine-bios-
 done
 [[ -x boot/limine/limine ]] || chmod +x boot/limine/limine
 make all
-mkdir -p build/iso-root/boot/limine build/iso-root/Applications/Solaris-Networking
+mkdir -p build/iso-root/boot/limine build/iso-root/Applications
 cp build/kernel.elf build/iso-root/boot/kernel.elf
-cp apps/solaris-networking/index.html build/iso-root/Applications/Solaris-Networking/index.html
+cp -a apps/. build/iso-root/Applications/
 cp boot/limine.conf build/iso-root/boot/limine/limine.conf
 cp boot/limine/limine-bios.sys boot/limine/limine-bios-cd.bin boot/limine/limine-uefi-cd.bin build/iso-root/boot/limine/
 xorriso -as mkisofs -R -r -J \
