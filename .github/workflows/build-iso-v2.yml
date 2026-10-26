@@ -1,0 +1,155 @@
+name: Build GenOS ISO v2 editions
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'kernel/**'
+      - 'boot/**'
+      - 'apps/**'
+      - 'tools/gem/**'
+      - 'tests/**'
+      - 'Makefile'
+      - 'build-iso.sh'
+      - '.github/workflows/build-iso-v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-test:
+    name: Build and QEMU test ${{ matrix.edition }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - edition: genos-v2-main
+            ref: main
+            current: true
+          - edition: genos-genesis-test-18
+            ref: genos-test-18
+            current: false
+    steps:
+      - name: Checkout edition source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.ref }}
+
+      - name: Install build and boot-test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential binutils xorriso python3 file curl ca-certificates qemu-system-x86 xvfb
+
+      - name: Download official Limine binary release
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p /tmp/limine-dist boot/limine
+          curl --fail --location --retry 3 https://github.com/Limine-Bootloader/Limine/releases/latest/download/limine-binary.tar.gz --output /tmp/limine-binary.tar.gz
+          tar -xzf /tmp/limine-binary.tar.gz -C /tmp/limine-dist
+          limine_bin="$(find /tmp/limine-dist -type f -name limine -print -quit)"
+          if [ -z "$limine_bin" ]; then
+            make -C /tmp/limine-dist/limine-binary
+            limine_bin="$(find /tmp/limine-dist -type f -name limine -print -quit)"
+          fi
+          bios_sys="$(find /tmp/limine-dist -type f -name limine-bios.sys -print -quit)"
+          bios_cd="$(find /tmp/limine-dist -type f -name limine-bios-cd.bin -print -quit)"
+          uefi_cd="$(find /tmp/limine-dist -type f -name limine-uefi-cd.bin -print -quit)"
+          test -n "$limine_bin" && test -n "$bios_sys" && test -n "$bios_cd" && test -n "$uefi_cd"
+          install -m 0755 "$limine_bin" boot/limine/limine
+          install -m 0644 "$bios_sys" boot/limine/limine-bios.sys
+          install -m 0644 "$bios_cd" boot/limine/limine-bios-cd.bin
+          install -m 0644 "$uefi_cd" boot/limine/limine-uefi-cd.bin
+          boot/limine/limine --version
+
+      - name: Compile and run current package tests
+        if: matrix.current
+        run: make clean test
+
+      - name: Compile legacy edition
+        if: ${{ !matrix.current }}
+        run: make clean all
+
+      - name: Build hybrid BIOS/UEFI ISO
+        run: ./build-iso.sh
+
+      - name: Smoke-test BIOS boot in QEMU
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          rm -f /tmp/genos-serial.log /tmp/genos-qemu.log
+          xvfb-run -a qemu-system-x86_64 \
+            -machine pc -m 512M -vga std \
+            -cdrom build/GenOS-Genesis-x86_64.iso -boot d \
+            -serial file:/tmp/genos-serial.log \
+            -display gtk -no-reboot -no-shutdown \
+            >/tmp/genos-qemu.log 2>&1 &
+          qemu_pid=$!
+          cleanup() { kill "$qemu_pid" 2>/dev/null || true; }
+          trap cleanup EXIT
+          for attempt in $(seq 1 30); do
+            if grep -q "GENKERNEL BOOTED" /tmp/genos-serial.log 2>/dev/null; then
+              cat /tmp/genos-serial.log
+              exit 0
+            fi
+            if ! kill -0 "$qemu_pid" 2>/dev/null; then
+              cat /tmp/genos-qemu.log
+              cat /tmp/genos-serial.log 2>/dev/null || true
+              exit 1
+            fi
+            sleep 1
+          done
+          cat /tmp/genos-qemu.log
+          cat /tmp/genos-serial.log 2>/dev/null || true
+          exit 1
+
+      - name: Name ISO and write checksum
+        run: |
+          set -Eeuo pipefail
+          mv build/GenOS-Genesis-x86_64.iso "build/GenOS-${{ matrix.edition }}-x86_64.iso"
+          (cd build && sha256sum "GenOS-${{ matrix.edition }}-x86_64.iso" > "SHA256SUMS-${{ matrix.edition }}.txt")
+          (cd build && sha256sum --check "SHA256SUMS-${{ matrix.edition }}.txt")
+
+      - name: Upload tested edition
+        uses: actions/upload-artifact@v4
+        with:
+          name: GenOS-ISO-v2-${{ matrix.edition }}
+          path: |
+            build/GenOS-${{ matrix.edition }}-x86_64.iso
+            build/SHA256SUMS-${{ matrix.edition }}.txt
+          if-no-files-found: error
+          retention-days: 90
+
+  publish:
+    name: Publish ISO v2 release
+    needs: build-test
+    if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Download all tested edition artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: GenOS-ISO-v2-*
+          path: dist
+          merge-multiple: true
+
+      - name: Publish both ISOs
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: genos-v2-${{ github.run_number }}
+          name: GenOS ISO v2 — build ${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
+          body: |
+            ISO v2 editions built from the current main branch and the existing genos-test-18 reference.
+            Both edition jobs must pass compilation and BIOS QEMU smoke testing before this release is created.
+            These are hybrid BIOS/UEFI images; the QEMU smoke test validates the BIOS virtual-machine path only.
+            Check the corresponding SHA256SUMS file before use.
+          files: |
+            dist/GenOS-genos-v2-main-x86_64.iso
+            dist/SHA256SUMS-genos-v2-main.txt
+            dist/GenOS-genos-genesis-test-18-x86_64.iso
+            dist/SHA256SUMS-genos-genesis-test-18.txt
+          fail_on_unmatched_files: true
