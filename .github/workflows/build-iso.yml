@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'kernel/**'
+      - 'apps/**'
       - 'boot/**'
       - 'build-iso.sh'
       - 'Makefile'
@@ -111,7 +112,8 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish tested ISO as GitHub Release
+      - name: Publish tested ISO as GitHub Release (optional)
+        continue-on-error: true
         if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
