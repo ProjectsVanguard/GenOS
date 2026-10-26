@@ -1,0 +1,54 @@
+name: Publish GenOS app-suite update (no ISO)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/**'
+      - 'tools/apply-suite-update.sh'
+      - '.github/workflows/publish-suite-update.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package-suite-update:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Build update bundle
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p dist
+          zip -qr dist/GenOS-Suite-Update.zip apps
+          sha256sum dist/GenOS-Suite-Update.zip > dist/SHA256SUMS.txt
+          cat > dist/update-manifest.json <<EOF
+          {
+            "product": "GenOS Suite",
+            "channel": "stable",
+            "version": "suite-${GITHUB_RUN_NUMBER}",
+            "commit": "${GITHUB_SHA}",
+            "created_at_utc": "${GITHUB_RUN_ID}",
+            "package": "GenOS-Suite-Update.zip",
+            "checksum_file": "SHA256SUMS.txt",
+            "note": "App-suite bundle only. Does not contain a kernel or ISO."
+          }
+          EOF
+          (cd dist && zip -q GenOS-Suite-Update.zip.sha256.zip SHA256SUMS.txt update-manifest.json)
+          ls -lh dist
+
+      - name: Upload standalone suite update
+        uses: actions/upload-artifact@v4
+        with:
+          name: GenOS-Suite-Update-${{ github.run_number }}
+          path: |
+            dist/GenOS-Suite-Update.zip
+            dist/SHA256SUMS.txt
+            dist/update-manifest.json
+          if-no-files-found: error
+          retention-days: 90
