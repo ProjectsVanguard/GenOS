@@ -1,4 +1,6 @@
-# Atualizações da GenOS Suite sem gerar ISO
+# Atualizações obrigatórias da GenOS Suite sem gerar ISO
+
+**Política de distribuição:** os manifestos desta suite marcam a atualização como `mandatory: true` e `update_policy: required`. Instale a versão exigida antes de continuar a usar a suite distribuída. Importante: como o GenOS ainda não tem um atualizador nativo, essa obrigatoriedade é declarativa/documental; não existe bloqueio automático no kernel ou no launcher.
 
 Alterações em `apps/**` publicam um pacote independente da suite e **não** disparam os workflows de ISO. O pacote não contém kernel, bootloader nem imagem ISO.
 
