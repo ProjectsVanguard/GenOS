@@ -96,9 +96,9 @@ jobs:
               pass
           # Select the only configured Limine entry explicitly; do not rely on
           # the menu countdown or on a screenshot taken during the boot menu.
-          sock.sendall(b"sendkey ret\n")
+          sock.sendall(b"sendkey ret\r")
           time.sleep(12)
-          sock.sendall(b"screendump /tmp/genos-boot.ppm\n")
+          sock.sendall(b"screendump /tmp/genos-boot.ppm\r")
           time.sleep(2)
           try:
               print(sock.recv(4096).decode(errors="replace"))
