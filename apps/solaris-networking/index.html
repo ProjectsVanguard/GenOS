@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Solaris Networking</title>
+<style>
+body{margin:0;background:#101522;color:#eaf0ff;font:16px Segoe UI,Arial,sans-serif}header{padding:20px 28px;background:#151e2e;border-bottom:1px solid #34415a}main{max-width:900px;margin:8vh auto;padding:24px}h1{font-size:22px}h2{font-size:42px;margin-bottom:10px}.muted{color:#aebbd2}.bar{display:flex;gap:10px;margin:28px 0;padding:8px;border:1px solid #3c4c68;border-radius:14px;background:#1a2334}input{flex:1;min-width:0;padding:14px;border:0;background:transparent;color:white;font-size:16px}button{padding:0 20px;border:0;border-radius:10px;background:#ffc56b;font-weight:bold}.cards{display:flex;gap:14px;flex-wrap:wrap}.card{flex:1;min-width:180px;background:#182132;border:1px solid #303d55;border-radius:14px;padding:18px}.note{color:#ffc56b;font-size:14px}iframe{width:100%;height:50vh;border:1px solid #3c4c68;border-radius:12px;display:none}
+</style></head>
+<body><header><h1>☀ Solaris Networking</h1><span class="muted">Navegador experimental do GenOS · Preview 0.1</span></header>
+<main><p class="muted">GENOS • WEB EXPLORER</p><h2>Explore a web.<br>Do seu jeito.</h2><p class="muted">Interface inicial para navegação web, planejada como aplicativo integrado ao GenOS.</p>
+<form class="bar" action="#" onsubmit="return openPage(event)"><input id="address" aria-label="Endereço ou pesquisa" placeholder="Digite um endereço HTTP ou HTTPS" value="https://example.com"><button type="submit">Abrir</button></form>
+<p id="status" class="note">A rede ainda não está disponível dentro do GenOS. Este protótipo funciona quando aberto em um navegador de outro sistema.</p><iframe id="page" title="Página web"></iframe>
+<div class="cards"><section class="card"><b>Navegação</b><p class="muted">Barra de endereço e visualização experimental.</p></section><section class="card"><b>Conectividade</b><p class="muted">Planejado para futuras funções de rede do GenOS.</p></section><section class="card"><b>Privacidade</b><p class="muted">Não implementa ainda sandbox, bloqueio de rastreadores ou proteção de navegador.</p></section></div></main>
+<script>
+function openPage(event){event.preventDefault();var field=document.getElementById('address');var status=document.getElementById('status');var page=document.getElementById('page');var value=field.value.trim();if(!value){status.textContent='Digite um endereço.';return false;}if(!/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(value)){value='https://'+value;}try{var url=new URL(value);if(url.protocol!=='http:'&&url.protocol!=='https:'){status.textContent='Use um endereço HTTP ou HTTPS.';return false;}page.src=url.href;page.style.display='block';status.textContent='Tentando abrir '+url.href+'. Alguns sites bloqueiam visualização incorporada.';}catch(e){status.textContent='Endereço inválido.';}return false;}
+</script></body></html>
