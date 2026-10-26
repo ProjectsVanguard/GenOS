@@ -2,6 +2,18 @@
 
 O GenOS é um sistema operacional experimental próprio para x86-64, não uma distribuição Linux. Este repositório contém o código-fonte inicial, ferramentas de desenvolvimento e protótipos de aplicativos.
 
+## Downloads das edições GenOS
+
+<p align="center">
+  <a href="https://github.com/ProjectsVanguard/GenOS/releases/latest"><img alt="Baixar GenOS Core" src="https://img.shields.io/badge/Download-GenOS%20Core-2563eb?style=for-the-badge&logo=github"></a>
+  <a href="https://github.com/ProjectsVanguard/GenOS/releases/latest"><img alt="Baixar GenOS Ultimate" src="https://img.shields.io/badge/Download-GenOS%20Ultimate-7c3aed?style=for-the-badge&logo=github"></a>
+  <a href="https://github.com/ProjectsVanguard/GenOS/releases/latest"><img alt="Baixar GenOS Enterprise" src="https://img.shields.io/badge/Download-GenOS%20Enterprise-0f766e?style=for-the-badge&logo=github"></a>
+</p>
+
+> **Status:** as três edições Core, Ultimate e Enterprise ainda não foram publicadas como ISOs independentes. Os botões abrem a página de releases; os downloads específicos de cada edição serão disponibilizados quando os builds correspondentes existirem e passarem nos testes. Não considere uma edição disponível apenas porque o botão aparece.
+
+[Ver todas as releases e downloads](https://github.com/ProjectsVanguard/GenOS/releases)
+
 ## Gerar a ISO de teste
 
 O GitHub Actions tenta construir automaticamente uma ISO híbrida BIOS/UEFI a cada alteração relevante na branch `main`.
