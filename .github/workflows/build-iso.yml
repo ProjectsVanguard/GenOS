@@ -32,25 +32,23 @@ jobs:
         run: |
           set -Eeuo pipefail
           mkdir -p /tmp/limine-dist boot/limine
-          curl --fail --location --retry 3 \
-            https://github.com/Limine-Bootloader/Limine/releases/latest/download/limine-binary.tar.gz \
-            --output /tmp/limine-binary.tar.gz
+          curl --fail --location --retry 3 https://github.com/Limine-Bootloader/Limine/releases/latest/download/limine-binary.tar.gz --output /tmp/limine-binary.tar.gz
           tar -xzf /tmp/limine-binary.tar.gz -C /tmp/limine-dist
           echo "Files in official Limine archive:"
           find /tmp/limine-dist -maxdepth 4 -type f -print | sort
           limine_bin="$(find /tmp/limine-dist -type f -name limine -print -quit)"
           if [ -z "$limine_bin" ]; then
-            echo "Limine archive ships limine.c and Makefile, but not a prebuilt Linux CLI; compiling it now."
+            echo "Compiling Limine CLI from the official source archive."
             make -C /tmp/limine-dist/limine-binary
             limine_bin="$(find /tmp/limine-dist -type f -name limine -print -quit)"
           fi
           bios_sys="$(find /tmp/limine-dist -type f -name limine-bios.sys -print -quit)"
           bios_cd="$(find /tmp/limine-dist -type f -name limine-bios-cd.bin -print -quit)"
           uefi_cd="$(find /tmp/limine-dist -type f -name limine-uefi-cd.bin -print -quit)"
-          test -n "$limine_bin" || { echo "::error::Limine CLI binary not found in release archive"; exit 1; }
-          test -n "$bios_sys" || { echo "::error::limine-bios.sys not found in release archive"; exit 1; }
-          test -n "$bios_cd" || { echo "::error::limine-bios-cd.bin not found in release archive"; exit 1; }
-          test -n "$uefi_cd" || { echo "::error::limine-uefi-cd.bin not found in release archive"; exit 1; }
+          test -n "$limine_bin" || { echo "::error::Limine CLI not found"; exit 1; }
+          test -n "$bios_sys" || { echo "::error::limine-bios.sys not found"; exit 1; }
+          test -n "$bios_cd" || { echo "::error::limine-bios-cd.bin not found"; exit 1; }
+          test -n "$uefi_cd" || { echo "::error::limine-uefi-cd.bin not found"; exit 1; }
           install -m 0755 "$limine_bin" boot/limine/limine
           install -m 0644 "$bios_sys" boot/limine/limine-bios.sys
           install -m 0644 "$bios_cd" boot/limine/limine-bios-cd.bin
@@ -78,7 +76,7 @@ jobs:
           cleanup() { kill "$qemu_pid" 2>/dev/null || true; }
           trap cleanup EXIT
           python3 - <<'PY'
-          import os, socket, time
+          import socket, time
           path = "/tmp/genos-qemu-monitor"
           deadline = time.time() + 15
           sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
@@ -90,13 +88,20 @@ jobs:
                   time.sleep(0.25)
           else:
               raise SystemExit("QEMU monitor did not start")
-          sock.settimeout(2)
-          time.sleep(8)
-          sock.recv(4096)
+          sock.settimeout(3)
+          time.sleep(1)
+          try:
+              print(sock.recv(4096).decode(errors="replace"))
+          except socket.timeout:
+              pass
+          # Select the only configured Limine entry explicitly; do not rely on
+          # the menu countdown or on a screenshot taken during the boot menu.
+          sock.sendall(b"sendkey ret\n")
+          time.sleep(12)
           sock.sendall(b"screendump /tmp/genos-boot.ppm\n")
           time.sleep(2)
           try:
-              sock.recv(4096)
+              print(sock.recv(4096).decode(errors="replace"))
           except socket.timeout:
               pass
           sock.close()
@@ -105,7 +110,7 @@ jobs:
           tesseract /tmp/genos-boot.ppm /tmp/genos-boot 2>/dev/null
           cat /tmp/genos-boot.txt
           grep -q "GENKERNEL BOOTED" /tmp/genos-boot.txt || {
-            echo "::error::ISO did not show the expected GenOS kernel desktop in QEMU BIOS boot"
+            echo "::error::GenOS kernel desktop not detected after explicit Limine selection"
             cat /tmp/genos-qemu.log
             exit 1
           }
