@@ -1,0 +1,127 @@
+name: Build GenOS editions
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'kernel/**'
+      - 'boot/**'
+      - 'build-iso.sh'
+      - 'Makefile'
+      - '.github/workflows/build-editions.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build-editions:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential binutils xorriso python3 file curl ca-certificates qemu-system-x86
+
+      - name: Download official Limine binaries
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p /tmp/limine-dist boot/limine
+          curl --fail --location --retry 3 https://github.com/Limine-Bootloader/Limine/releases/latest/download/limine-binary.tar.gz --output /tmp/limine-binary.tar.gz
+          tar -xzf /tmp/limine-binary.tar.gz -C /tmp/limine-dist
+          limine_bin="$(find /tmp/limine-dist -type f -name limine -print -quit)"
+          if [ -z "$limine_bin" ]; then
+            make -C /tmp/limine-dist/limine-binary
+            limine_bin="$(find /tmp/limine-dist -type f -name limine -print -quit)"
+          fi
+          for pair in "limine-bios.sys" "limine-bios-cd.bin" "limine-uefi-cd.bin"; do
+            src="$(find /tmp/limine-dist -type f -name "$pair" -print -quit)"
+            test -n "$src"
+            install -m 0644 "$src" "boot/limine/$pair"
+          done
+          test -n "$limine_bin"
+          install -m 0755 "$limine_bin" boot/limine/limine
+          boot/limine/limine --version
+
+      - name: Compile and test GenOS
+        run: make clean test
+
+      - name: Build and BIOS-boot-test three edition ISOs
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p dist
+          for edition in Enterprise-LTSC Ultimate Core; do
+            echo "Building GenOS $edition"
+            make clean all
+            mkdir -p build/iso-root/boot/limine
+            cp build/kernel.elf build/iso-root/boot/kernel.elf
+            cp boot/limine.conf build/iso-root/boot/limine/limine.conf
+            cp boot/limine/limine-bios.sys boot/limine/limine-bios-cd.bin boot/limine/limine-uefi-cd.bin build/iso-root/boot/limine/
+            cat > build/iso-root/GENOS-EDITION.txt <<EOF
+          GenOS $edition
+          Release family: Genesis 0.1
+          Architecture: x86_64
+          Boot validation: BIOS QEMU smoke test
+          Note: Edition label/profile only; edition-specific feature sets are not implemented yet.
+          EOF
+            iso="dist/GenOS-$edition-x86_64.iso"
+            xorriso -as mkisofs -R -r -J \
+              -b boot/limine/limine-bios-cd.bin -no-emul-boot -boot-load-size 4 -boot-info-table \
+              --efi-boot boot/limine/limine-uefi-cd.bin -efi-boot-part --efi-boot-image \
+              --protective-msdos-label build/iso-root -o "$iso"
+            boot/limine/limine bios-install "$iso"
+            test -s "$iso"
+            echo "Testing $iso in QEMU"
+            rm -f "/tmp/genos-$edition-serial.log"
+            timeout 20s qemu-system-x86_64 -machine pc -m 512M -vga std \
+              -cdrom "$iso" -boot d -serial "file:/tmp/genos-$edition-serial.log" \
+              -display none -no-reboot -no-shutdown >/tmp/genos-qemu.log 2>&1 || qemu_status=$?
+            if ! grep -q "GENKERNEL BOOTED" "/tmp/genos-$edition-serial.log"; then
+              echo "::error::GenKernel boot marker missing for $edition"
+              cat /tmp/genos-qemu.log
+              cat "/tmp/genos-$edition-serial.log" 2>/dev/null || true
+              exit 1
+            fi
+            sha256sum "$iso" >> dist/SHA256SUMS.txt
+            unset qemu_status || true
+            rm -rf build/iso-root
+          done
+          cat dist/SHA256SUMS.txt
+          sha256sum --check dist/SHA256SUMS.txt
+
+      - name: Upload all edition ISOs
+        uses: actions/upload-artifact@v4
+        with:
+          name: GenOS-Three-Editions
+          path: |
+            dist/GenOS-Enterprise-LTSC-x86_64.iso
+            dist/GenOS-Ultimate-x86_64.iso
+            dist/GenOS-Core-x86_64.iso
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish editions release
+        if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: genos-editions-${{ github.run_number }}
+          name: GenOS Genesis editions build ${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
+          body: |
+            Three experimental GenOS Genesis 0.1 ISO variants: Enterprise LTSC, Ultimate, and Core.
+
+            Each ISO is published only after the build and BIOS QEMU kernel-boot smoke test pass. The edition names currently identify profiles only; separate edition-specific functionality is not implemented yet. The automated test validates BIOS boot in QEMU, not physical hardware or UEFI firmware.
+            Verify SHA256SUMS.txt before writing an ISO to USB.
+          files: |
+            dist/GenOS-Enterprise-LTSC-x86_64.iso
+            dist/GenOS-Ultimate-x86_64.iso
+            dist/GenOS-Core-x86_64.iso
+            dist/SHA256SUMS.txt
+          fail_on_unmatched_files: true
