@@ -1,7 +1,8 @@
 CC ?= gcc
 CFLAGS = -std=c11 -O2 -Wall -Wextra -Werror -ffreestanding -fno-stack-protector -fno-pic -fno-pie -m64 -mno-red-zone -mcmodel=kernel -fno-asynchronous-unwind-tables -fno-unwind-tables
 LDFLAGS = -nostdlib -static -no-pie -Wl,-T,kernel/linker.ld -Wl,--build-id=none
-.PHONY: all clean test gem suite-gem
+.PHONY: all clean test gem suite-gem FORCE
+FORCE:
 all: build/kernel.elf build/org.genos.hello.gem
 build:
 	mkdir -p build
@@ -14,7 +15,7 @@ gem: build/org.genos.hello.gem
 suite-gem: build/org.genos.suite.gem
 build/org.genos.hello.gem: apps/hello/manifest.json apps/hello/bin/hello.txt tools/gem/genpkg.py | build
 	python3 tools/gem/genpkg.py pack apps/hello -o $@
-build/org.genos.suite.gem: apps/genos-suite/index.html tools/gem/build_suite.py tools/gem/genpkg.py
+build/org.genos.suite.gem: FORCE apps/genos-suite/index.html tools/gem/build_suite.py tools/gem/genpkg.py
 	python3 tools/gem/build_suite.py $@
 test: all suite-gem
 	python3 tools/gem/genpkg.py validate build/org.genos.hello.gem
