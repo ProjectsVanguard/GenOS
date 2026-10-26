@@ -36,14 +36,16 @@ jobs:
             https://github.com/Limine-Bootloader/Limine/releases/latest/download/limine-binary.tar.gz \
             --output /tmp/limine-binary.tar.gz
           tar -xzf /tmp/limine-binary.tar.gz -C /tmp/limine-dist
-          limine_bin="$(find /tmp/limine-dist -type f -name limine -perm /111 -print -quit)"
+          echo "Files in official Limine archive:"
+          find /tmp/limine-dist -maxdepth 4 -type f -print | sort
+          limine_bin="$(find /tmp/limine-dist -type f -name limine -print -quit)"
           bios_sys="$(find /tmp/limine-dist -type f -name limine-bios.sys -print -quit)"
           bios_cd="$(find /tmp/limine-dist -type f -name limine-bios-cd.bin -print -quit)"
           uefi_cd="$(find /tmp/limine-dist -type f -name limine-uefi-cd.bin -print -quit)"
-          test -n "$limine_bin"
-          test -n "$bios_sys"
-          test -n "$bios_cd"
-          test -n "$uefi_cd"
+          test -n "$limine_bin" || { echo "::error::Limine CLI binary not found in release archive"; exit 1; }
+          test -n "$bios_sys" || { echo "::error::limine-bios.sys not found in release archive"; exit 1; }
+          test -n "$bios_cd" || { echo "::error::limine-bios-cd.bin not found in release archive"; exit 1; }
+          test -n "$uefi_cd" || { echo "::error::limine-uefi-cd.bin not found in release archive"; exit 1; }
           install -m 0755 "$limine_bin" boot/limine/limine
           install -m 0644 "$bios_sys" boot/limine/limine-bios.sys
           install -m 0644 "$bios_cd" boot/limine/limine-bios-cd.bin
