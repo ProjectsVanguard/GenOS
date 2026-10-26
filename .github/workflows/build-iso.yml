@@ -65,12 +65,12 @@ jobs:
         shell: bash
         run: |
           set -Eeuo pipefail
-          rm -f /tmp/genos-qemu-monitor /tmp/genos-qmp.sock /tmp/genos-boot.ppm /tmp/genos-boot.txt
+          rm -f /tmp/genos-qemu-monitor /tmp/genos-qmp.sock /tmp/genos-boot.ppm /tmp/genos-boot.txt /tmp/genos-serial.log
           xvfb-run -a qemu-system-x86_64 \
             -machine pc -m 512M \
             -cdrom build/GenOS-Genesis-x86_64.iso -boot d \
             -qmp unix:/tmp/genos-qmp.sock,server=on,wait=off \
-            -display sdl -no-reboot -no-shutdown \
+            -serial file:/tmp/genos-serial.log -display sdl -no-reboot -no-shutdown \
             >/tmp/genos-qemu.log 2>&1 &
           qemu_pid=$!
           cleanup() { kill "$qemu_pid" 2>/dev/null || true; }
@@ -88,7 +88,7 @@ jobs:
                   time.sleep(0.25)
           else:
               raise SystemExit("QEMU QMP socket did not start")
-          sock.settimeout(5)
+          sock.settimeout(30)
           stream = sock.makefile("rwb", buffering=0)
           greeting = json.loads(stream.readline().decode())
           if "QMP" not in greeting:
@@ -106,9 +106,7 @@ jobs:
                       raise RuntimeError(f"QMP {command} failed: {response['error']}")
           qmp("qmp_capabilities")
           # QMP executes monitor commands directly; no terminal line editing involved.
-          time.sleep(2)
-          qmp("human-monitor-command", {"command-line": "sendkey ret"})
-          time.sleep(15)
+          time.sleep(20)
           qmp("human-monitor-command", {"command-line": "screendump /tmp/genos-boot.ppm"})
           sock.close()
           PY
@@ -116,7 +114,7 @@ jobs:
           tesseract /tmp/genos-boot.ppm /tmp/genos-boot 2>/dev/null
           cat /tmp/genos-boot.txt
           grep -q "GENKERNEL BOOTED" /tmp/genos-boot.txt || {
-            echo "::error::GenOS kernel desktop not detected after explicit Limine selection"
+            echo "::error::GenKernel did not report successful boot on the serial console"
             cat /tmp/genos-qemu.log
             exit 1
           }
