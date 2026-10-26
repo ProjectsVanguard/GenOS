@@ -67,10 +67,10 @@ jobs:
           set -Eeuo pipefail
           rm -f /tmp/genos-serial.log /tmp/genos-qemu.log
           xvfb-run -a qemu-system-x86_64 \
-            -machine pc -m 512M \
+            -machine pc -m 512M -vga std \
             -cdrom build/GenOS-Genesis-x86_64.iso -boot d \
             -serial file:/tmp/genos-serial.log \
-            -display none -no-reboot -no-shutdown \
+            -display gtk -no-reboot -no-shutdown \
             >/tmp/genos-qemu.log 2>&1 &
           qemu_pid=$!
           cleanup() { kill "$qemu_pid" 2>/dev/null || true; }
