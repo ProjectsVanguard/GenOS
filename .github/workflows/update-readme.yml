@@ -1,0 +1,67 @@
+name: Auto-update README
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - README.md
+      - .github/workflows/update-readme.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Refresh automatic update marker
+        env:
+          COMMIT_SHA: ${{ github.sha }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message || 'Manual README refresh' }}
+          COMMIT_DATE: ${{ github.event.head_commit.timestamp || github.event.repository.updated_at }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+
+          path = Path("README.md")
+          text = path.read_text(encoding="utf-8")
+          start = "<!-- README-AUTO-UPDATE:START -->"
+          end = "<!-- README-AUTO-UPDATE:END -->"
+          if start not in text or end not in text:
+              raise SystemExit("README automatic-update markers are missing")
+
+          sha = os.environ["COMMIT_SHA"][:7]
+          message = os.environ["COMMIT_MESSAGE"].splitlines()[0].strip()
+          message = message.replace("|", "\\|")
+          date = os.environ["COMMIT_DATE"]
+          entry = (
+              f"- Última atualização automática: {date} UTC "
+              f"— commit [`{sha}`](https://github.com/ProjectsVanguard/GenOS/commit/{os.environ['COMMIT_SHA']}) "
+              f"— {message}"
+          )
+          before, rest = text.split(start, 1)
+          _, after = rest.split(end, 1)
+          updated = before + start + "\n" + entry + "\n" + end + after
+          path.write_text(updated, encoding="utf-8")
+          PY
+
+      - name: Commit README update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          if git diff --cached --quiet; then
+            echo "README already up to date."
+            exit 0
+          fi
+          git commit -m "docs: auto-update README [skip ci]"
+          git push origin HEAD:main
