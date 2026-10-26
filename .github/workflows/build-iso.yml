@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-iso:
@@ -137,3 +137,21 @@ jobs:
             build/SHA256SUMS.txt
           if-no-files-found: error
           retention-days: 30
+
+      - name: Publish tested ISO as GitHub Release
+        if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: genos-test-${{ github.run_number }}
+          name: GenOS Genesis test build ${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
+          body: |
+            Automated GenOS Genesis test ISO.
+
+            The ISO is published only after the kernel build, package tests, ISO creation, and BIOS QEMU desktop smoke test pass. This validates the tested BIOS virtual-machine path only; it does not guarantee compatibility with every physical computer or UEFI firmware.
+
+            Check SHA256SUMS.txt before writing the ISO to USB.
+          files: |
+            build/GenOS-Genesis-x86_64.iso
+            build/SHA256SUMS.txt
+          fail_on_unmatched_files: true
