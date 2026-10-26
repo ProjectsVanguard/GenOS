@@ -31,12 +31,15 @@ jobs:
           {
             "product": "GenOS Suite",
             "channel": "stable",
+            "mandatory": true,
+            "update_policy": "required",
             "version": "suite-${GITHUB_RUN_NUMBER}",
             "commit": "${GITHUB_SHA}",
             "created_at_utc": "${GITHUB_RUN_ID}",
             "package": "GenOS-Suite-Update.zip",
             "checksum_file": "SHA256SUMS.txt",
-            "note": "App-suite bundle only. Does not contain a kernel or ISO."
+            "notice": "OBRIGATORIA: aplique esta atualização da suite.",
+            "note": "App-suite bundle only. Does not contain a kernel or ISO. The mandatory flag is distribution metadata; no native GenOS updater currently enforces it."
           }
           EOF
           (cd dist && zip -q GenOS-Suite-Update.zip.sha256.zip SHA256SUMS.txt update-manifest.json)
