@@ -1,0 +1,13 @@
+{
+  "format": "gem",
+  "format_version": 1,
+  "id": "org.genos.hello",
+  "name": "Gen Hello",
+  "version": "0.1.0",
+  "description": "Aplicativo de exemplo para o GenOS GDP",
+  "author": "Projeto GenOS",
+  "entrypoint": "bin/hello.txt",
+  "architecture": ["x86_64"],
+  "min_genos_version": "0.1.0",
+  "permissions": []
+}

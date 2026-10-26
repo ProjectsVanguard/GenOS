@@ -1,0 +1,2 @@
+GenOS .gem example payload
+This package validates the initial package format; it is not yet a native executable.
