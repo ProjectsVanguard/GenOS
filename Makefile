@@ -9,8 +9,10 @@ build:
 	mkdir -p build
 build/kernel.o: kernel/kernel.c kernel/limine.h | build
 	$(CC) $(CFLAGS) -c $< -o $@
-build/kernel.elf: build/kernel.o kernel/linker.ld
-	$(CC) $(LDFLAGS) $< -o $@
+build/native_apps.o: kernel/native_apps.c kernel/native_apps.h | build
+	$(CC) $(CFLAGS) -c $< -o $@
+build/kernel.elf: build/kernel.o build/native_apps.o kernel/linker.ld
+	$(CC) $(LDFLAGS) build/kernel.o build/native_apps.o -o $@
 	file $@
 gem: build/org.genos.hello.gem
 suite-gem: build/org.genos.suite.gem
