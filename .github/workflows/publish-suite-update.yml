@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - 'apps/**'
+      - 'tools/gem/**'
+      - 'Makefile'
       - 'tools/apply-suite-update.sh'
       - '.github/workflows/publish-suite-update.yml'
   workflow_dispatch:
@@ -25,7 +27,10 @@ jobs:
         run: |
           set -Eeuo pipefail
           mkdir -p dist
+          python3 tools/gem/build_suite.py dist/org.genos.suite.gem
+          python3 tools/gem/genpkg.py validate dist/org.genos.suite.gem
           zip -qr dist/GenOS-Suite-Update.zip apps
+          sha256sum dist/org.genos.suite.gem > dist/GenOS-Suite.gem.sha256
           sha256sum dist/GenOS-Suite-Update.zip > dist/SHA256SUMS.txt
           cat > dist/update-manifest.json <<EOF
           {
@@ -36,7 +41,8 @@ jobs:
             "version": "suite-${GITHUB_RUN_NUMBER}",
             "commit": "${GITHUB_SHA}",
             "created_at_utc": "${GITHUB_RUN_ID}",
-            "package": "GenOS-Suite-Update.zip",
+            "package": "org.genos.suite.gem",
+            "legacy_bundle": "GenOS-Suite-Update.zip",
             "checksum_file": "SHA256SUMS.txt",
             "notice": "OBRIGATORIA: aplique esta atualização da suite.",
             "note": "App-suite bundle only. Does not contain a kernel or ISO. The mandatory flag is distribution metadata; no native GenOS updater currently enforces it."
@@ -50,6 +56,8 @@ jobs:
         with:
           name: GenOS-Suite-Update-${{ github.run_number }}
           path: |
+            dist/org.genos.suite.gem
+            dist/GenOS-Suite.gem.sha256
             dist/GenOS-Suite-Update.zip
             dist/SHA256SUMS.txt
             dist/update-manifest.json
