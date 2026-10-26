@@ -17,15 +17,15 @@ permissions:
 jobs:
   build-iso:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Install build dependencies
+      - name: Install build and boot-test dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential binutils xorriso python3 file curl ca-certificates
+          sudo apt-get install -y build-essential binutils xorriso python3 file curl ca-certificates qemu-system-x86 xvfb tesseract-ocr
 
       - name: Download official Limine binary release
         shell: bash
@@ -63,6 +63,53 @@ jobs:
       - name: Build hybrid BIOS/UEFI ISO
         run: ./build-iso.sh
 
+      - name: Smoke-test BIOS boot in QEMU and verify desktop
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          rm -f /tmp/genos-qemu-monitor /tmp/genos-boot.ppm /tmp/genos-boot.txt
+          xvfb-run -a qemu-system-x86_64 \
+            -machine pc -m 512M \
+            -cdrom build/GenOS-Genesis-x86_64.iso -boot d \
+            -monitor unix:/tmp/genos-qemu-monitor,server,nowait \
+            -display sdl -no-reboot -no-shutdown \
+            >/tmp/genos-qemu.log 2>&1 &
+          qemu_pid=$!
+          cleanup() { kill "$qemu_pid" 2>/dev/null || true; }
+          trap cleanup EXIT
+          python3 - <<'PY'
+          import os, socket, time
+          path = "/tmp/genos-qemu-monitor"
+          deadline = time.time() + 15
+          sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+          while time.time() < deadline:
+              try:
+                  sock.connect(path)
+                  break
+              except OSError:
+                  time.sleep(0.25)
+          else:
+              raise SystemExit("QEMU monitor did not start")
+          sock.settimeout(2)
+          time.sleep(8)
+          sock.recv(4096)
+          sock.sendall(b"screendump /tmp/genos-boot.ppm\n")
+          time.sleep(2)
+          try:
+              sock.recv(4096)
+          except socket.timeout:
+              pass
+          sock.close()
+          PY
+          test -s /tmp/genos-boot.ppm
+          tesseract /tmp/genos-boot.ppm /tmp/genos-boot 2>/dev/null
+          cat /tmp/genos-boot.txt
+          grep -q "GENKERNEL BOOTED" /tmp/genos-boot.txt || {
+            echo "::error::ISO did not show the expected GenOS kernel desktop in QEMU BIOS boot"
+            cat /tmp/genos-qemu.log
+            exit 1
+          }
+
       - name: Check ISO and checksum
         run: |
           set -Eeuo pipefail
@@ -70,7 +117,7 @@ jobs:
           test -s build/SHA256SUMS.txt
           sha256sum --check build/SHA256SUMS.txt
 
-      - name: Upload test ISO
+      - name: Upload tested ISO
         uses: actions/upload-artifact@v4
         with:
           name: GenOS-Genesis-x86_64-ISO
