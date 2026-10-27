@@ -2,15 +2,11 @@ name: Build GenOS V3 edition ISOs
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths: ['kernel/**', 'boot/**', 'apps/**', 'Makefile', 'build-iso.sh', 'installer/v3/editions/**', '.github/workflows/build-iso-v3.yml']
   push:
     branches: [main]
-    paths:
-      - 'kernel/**'
-      - 'boot/**'
-      - 'apps/**'
-      - 'Makefile'
-      - 'build-iso.sh'
-      - '.github/workflows/build-iso-v3.yml'
+    paths: ['kernel/**', 'boot/**', 'apps/**', 'Makefile', 'build-iso.sh', 'installer/v3/editions/**', '.github/workflows/build-iso-v3.yml']
 
 permissions:
   contents: write
@@ -42,21 +38,26 @@ jobs:
       - name: Compile and test
         run: make clean test
       - name: Build ISO
+        env:
+          GENOS_EDITION: ${{ matrix.edition }}
+          GENOS_VERSION: 3.0.0-preview
         run: ./build-iso.sh
-      - name: Name image and checksum
+      - name: Verify edition metadata, name image and checksum
         run: |
           set -eu
+          grep -F "GenOS V3 — ${{ matrix.edition }}" build/iso-root/GENOS-EDITION.txt
           mv build/GenOS-Genesis-x86_64.iso "build/GenOS-V3-${{ matrix.edition }}-x86_64.iso"
           (cd build && sha256sum "GenOS-V3-${{ matrix.edition }}-x86_64.iso" > "SHA256SUMS-V3-${{ matrix.edition }}.txt")
           (cd build && sha256sum --check "SHA256SUMS-V3-${{ matrix.edition }}.txt")
       - name: BIOS boot smoke test in QEMU
         run: |
           set -eu
+          rm -f /tmp/genos-serial.log /tmp/genos-qemu.log
           xvfb-run -a qemu-system-x86_64 -machine pc -m 512M -vga std -cdrom "build/GenOS-V3-${{ matrix.edition }}-x86_64.iso" -boot d -serial file:/tmp/genos-serial.log -display gtk -no-reboot -no-shutdown >/tmp/genos-qemu.log 2>&1 &
           pid=$!
           trap 'kill "$pid" 2>/dev/null || true' EXIT
           for attempt in $(seq 1 30); do
-            if grep -q "GENKERNEL BOOTED" /tmp/genos-serial.log 2>/dev/null; then exit 0; fi
+            if grep -q "GENKERNEL BOOTED" /tmp/genos-serial.log 2>/dev/null; then cat /tmp/genos-serial.log; exit 0; fi
             if ! kill -0 "$pid" 2>/dev/null; then cat /tmp/genos-qemu.log; cat /tmp/genos-serial.log 2>/dev/null || true; exit 1; fi
             sleep 1
           done
@@ -71,3 +72,35 @@ jobs:
             build/SHA256SUMS-V3-${{ matrix.edition }}.txt
           if-no-files-found: error
           retention-days: 90
+
+  publish:
+    needs: build
+    if: success() && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Download all tested edition artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: GenOS-V3-*
+          path: dist
+          merge-multiple: true
+      - name: Publish V3 editions
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: genos-v3-${{ github.run_number }}
+          name: GenOS V3 preview editions — build ${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
+          body: |
+            Separate GenOS V3 preview ISO builds: Home, Ultimate and Enterprise LTSC.
+            Each image passed compilation/package tests and BIOS QEMU boot smoke testing before publication.
+            Edition labels are metadata profiles only; edition-specific functionality is not implemented yet.
+            Enterprise LTSC is not a long-term-support commitment. UEFI and physical hardware are not validated by the BIOS QEMU test.
+            Verify the supplied SHA256SUMS files before use.
+          files: |
+            dist/GenOS-V3-Home-x86_64.iso
+            dist/SHA256SUMS-V3-Home.txt
+            dist/GenOS-V3-Ultimate-x86_64.iso
+            dist/SHA256SUMS-V3-Ultimate.txt
+            dist/GenOS-V3-Enterprise-LTSC-x86_64.iso
+            dist/SHA256SUMS-V3-Enterprise-LTSC.txt
+          fail_on_unmatched_files: true
