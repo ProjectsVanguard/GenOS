@@ -1,0 +1,29 @@
+name: Validate GenOS V3 Calamares scaffold
+on:
+  push:
+    branches: [main, feat/genos-v3-calamares-installer]
+    paths:
+      - 'installer/v3/**'
+      - '.github/workflows/validate-v3-installer.yml'
+  pull_request:
+    paths:
+      - 'installer/v3/**'
+      - '.github/workflows/validate-v3-installer.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate-scaffold:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate scaffold and safety disclosure
+        run: |
+          set -eu
+          test -s installer/v3/README.md
+          test -s installer/v3/calamares/settings.conf
+          test -s installer/v3/calamares/modules.conf
+          grep -q 'Estado: scaffold' installer/v3/README.md
+          grep -q 'partition' installer/v3/calamares/settings.conf
+          grep -q 'não é uma distribuição Linux' installer/v3/README.md
+          echo 'PASS: scaffold/documentation checks only; no installer ISO or disk installation tested.'
