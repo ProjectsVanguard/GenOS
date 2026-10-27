@@ -143,5 +143,5 @@ Ainda faltam componentes fundamentais de um sistema operacional de uso geral, in
 A seção abaixo é atualizada automaticamente pelo GitHub Actions quando alterações relevantes são enviadas para `main`. Para mudanças funcionais, atualize também manualmente as seções de estado, build e limitações, para que a documentação descreva o comportamento real — não apenas a existência de um commit.
 
 <!-- README-AUTO-UPDATE:START -->
-- Última atualização automática: 2026-10-26T22:07:24-03:00 UTC — commit [`28debcd`](https://github.com/ProjectsVanguard/GenOS/commit/28debcd0e7ba5a13a68413ae5af106f6681686a7) — Merge pull request #8 from ProjectsVanguard/feat/armv6-bringup
+- Última atualização automática: 2026-10-26T22:12:19-03:00 UTC — commit [`f29d21b`](https://github.com/ProjectsVanguard/GenOS/commit/f29d21b3b5a6d1915134b517132cfae7ec984ea5) — Merge pull request #10 from ProjectsVanguard/feat/app-store-gem-integration
 <!-- README-AUTO-UPDATE:END -->
