@@ -1,0 +1,44 @@
+name: ARMv6 bring-up
+
+on:
+  push:
+    branches: [main, feat/armv6-bringup]
+    paths:
+      - "arch/armv6/**"
+      - "Makefile"
+      - ".github/workflows/build-armv6.yml"
+  pull_request:
+    paths:
+      - "arch/armv6/**"
+      - "Makefile"
+      - ".github/workflows/build-armv6.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cross-compile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install ARM bare-metal toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi
+      - name: Build ARMv6 ELF and raw image
+        run: make armv6
+      - name: Verify ELF architecture
+        run: |
+          arm-none-eabi-readelf -h build/armv6/genos-armv6.elf | tee build/armv6/elf-header.txt
+          grep -q 'Machine:.*ARM' build/armv6/elf-header.txt
+      - name: Upload experimental ARMv6 image
+        uses: actions/upload-artifact@v4
+        with:
+          name: GenOS-ARMv6-bringup
+          path: |
+            build/armv6/genos-armv6.elf
+            build/armv6/kernel.img
+            arch/armv6/README.md
+          if-no-files-found: error
+          retention-days: 30
