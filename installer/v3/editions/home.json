@@ -1,0 +1,7 @@
+{
+  "edition": "Home",
+  "version": "3.0.0-preview",
+  "purpose": "Personal-use preview",
+  "status": "experimental",
+  "feature_differences": "Not implemented; shares the current GenKernel and application payload."
+}

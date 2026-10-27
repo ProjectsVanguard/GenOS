@@ -1,0 +1,8 @@
+{
+  "edition": "Enterprise LTSC",
+  "version": "3.0.0-preview",
+  "purpose": "Enterprise-oriented preview profile",
+  "status": "experimental",
+  "support_policy": "No LTSC lifecycle or long-term-support guarantee exists.",
+  "feature_differences": "Not implemented; shares the current GenKernel and application payload."
+}
