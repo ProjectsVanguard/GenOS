@@ -9,7 +9,13 @@ done
 make all
 mkdir -p build/iso-root/boot/limine build/iso-root/Applications
 cp build/kernel.elf build/iso-root/boot/kernel.elf
-cp -a apps/. build/iso-root/Applications/
+# Python CMD is exclusive to the Ultimate preview image.
+if [[ "${edition:-Genesis}" == "Ultimate" ]]; then
+  cp -a apps/. build/iso-root/Applications/
+else
+  cp -a apps/. build/iso-root/Applications/
+  rm -rf build/iso-root/Applications/ultimate-python-cmd
+fi
 cp boot/limine.conf build/iso-root/boot/limine/limine.conf
 cp boot/limine/limine-bios.sys boot/limine/limine-bios-cd.bin boot/limine/limine-uefi-cd.bin build/iso-root/boot/limine/
 edition="$(printenv GENOS_EDITION 2>/dev/null || true)"
@@ -20,8 +26,9 @@ cat > build/iso-root/GENOS-EDITION.txt <<EOF
 GenOS V3 — ${edition}
 Version: ${version}
 Kernel: experimental x86-64 GenKernel
-Edition profiles are metadata-only; edition-specific features are not implemented.
+Edition profiles are mostly metadata-only; Ultimate additionally includes the Python CMD web app.
 Enterprise LTSC is a preview label, not a long-term-support guarantee.
+Ultimate Python CMD uses Pyodide/WebAssembly in a browser and needs internet to download the runtime.
 EOF
 xorriso -as mkisofs -R -r -J \
   -b boot/limine/limine-bios-cd.bin -no-emul-boot -boot-load-size 4 -boot-info-table \
