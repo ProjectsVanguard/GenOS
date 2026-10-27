@@ -1,0 +1,6 @@
+# Branding inicial do instalador
+name: GenOS V3 Installer
+version: 0.1.0
+shortVersion: "V3 Preview"
+vendor: ProjectsVanguard
+productUrl: https://github.com/ProjectsVanguard/GenOS
