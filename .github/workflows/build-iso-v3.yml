@@ -29,7 +29,14 @@ jobs:
           mkdir -p /tmp/limine boot/limine
           curl -fL --retry 3 https://github.com/Limine-Bootloader/Limine/releases/latest/download/limine-binary.tar.gz -o /tmp/limine.tar.gz
           tar -xzf /tmp/limine.tar.gz -C /tmp/limine
-          install -m 0755 "$(find /tmp/limine -type f -name limine -print -quit)" boot/limine/limine
+          limine_bin="$(find /tmp/limine -type f -name limine -print -quit)"
+          if [ -z "$limine_bin" ]; then
+            limine_make="$(find /tmp/limine -type f -name Makefile -path "*/limine-binary/Makefile" -print -quit)"
+            if [ -n "$limine_make" ]; then make -C "$(dirname "$limine_make")"; fi
+            limine_bin="$(find /tmp/limine -type f -name limine -print -quit)"
+          fi
+          test -n "$limine_bin"
+          install -m 0755 "$limine_bin" boot/limine/limine
           install -m 0644 "$(find /tmp/limine -type f -name limine-bios.sys -print -quit)" boot/limine/limine-bios.sys
           install -m 0644 "$(find /tmp/limine -type f -name limine-bios-cd.bin -print -quit)" boot/limine/limine-bios-cd.bin
           install -m 0644 "$(find /tmp/limine -type f -name limine-uefi-cd.bin -print -quit)" boot/limine/limine-uefi-cd.bin
