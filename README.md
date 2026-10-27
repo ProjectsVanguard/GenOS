@@ -91,5 +91,5 @@ Ainda faltam componentes fundamentais de um sistema operacional de uso geral, in
 A seção abaixo é atualizada automaticamente pelo GitHub Actions quando alterações relevantes são enviadas para `main`. Para mudanças funcionais, atualize também manualmente as seções de estado, build e limitações, para que a documentação descreva o comportamento real — não apenas a existência de um commit.
 
 <!-- README-AUTO-UPDATE:START -->
-- Última atualização automática: 2026-10-26T21:26:37-03:00 UTC — commit [`092f9b2`](https://github.com/ProjectsVanguard/GenOS/commit/092f9b221036163829883623f5d8763f6b86f007) — feat: GenUI v2 glass desktop and simulated get-update terminal command
+- Última atualização automática: 2026-10-26T21:30:21-03:00 UTC — commit [`7ddd7ae`](https://github.com/ProjectsVanguard/GenOS/commit/7ddd7ae627dafff850133b1984911bc7683458a6) — Merge pull request #5 from ProjectsVanguard/feat/genos-v3-calamares-installer
 <!-- README-AUTO-UPDATE:END -->
