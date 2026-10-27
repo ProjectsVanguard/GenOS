@@ -3,5 +3,15 @@
   "version": "3.0.0-preview",
   "purpose": "Advanced-use preview",
   "status": "experimental",
-  "feature_differences": "Not implemented; shares the current GenKernel and application payload."
+  "feature_differences": "Includes the Python CMD browser app in the ISO payload; other edition differences remain limited.",
+  "applications": [
+    {
+      "id": "org.genos.ultimate-python-cmd",
+      "name": "Python CMD",
+      "path": "Applications/ultimate-python-cmd/index.html",
+      "runtime": "Pyodide/WebAssembly in browser",
+      "network_required_for_initial_runtime": true,
+      "native_kernel_integration": false
+    }
+  ]
 }
