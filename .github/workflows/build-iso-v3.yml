@@ -1,0 +1,73 @@
+name: Build GenOS V3 edition ISOs
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'kernel/**'
+      - 'boot/**'
+      - 'apps/**'
+      - 'Makefile'
+      - 'build-iso.sh'
+      - '.github/workflows/build-iso-v3.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        edition: [Home, Ultimate, Enterprise-LTSC]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential binutils xorriso python3 file curl ca-certificates qemu-system-x86 xvfb
+      - name: Install Limine binaries
+        run: |
+          set -eu
+          mkdir -p /tmp/limine boot/limine
+          curl -fL --retry 3 https://github.com/Limine-Bootloader/Limine/releases/latest/download/limine-binary.tar.gz -o /tmp/limine.tar.gz
+          tar -xzf /tmp/limine.tar.gz -C /tmp/limine
+          install -m 0755 "$(find /tmp/limine -type f -name limine -print -quit)" boot/limine/limine
+          install -m 0644 "$(find /tmp/limine -type f -name limine-bios.sys -print -quit)" boot/limine/limine-bios.sys
+          install -m 0644 "$(find /tmp/limine -type f -name limine-bios-cd.bin -print -quit)" boot/limine/limine-bios-cd.bin
+          install -m 0644 "$(find /tmp/limine -type f -name limine-uefi-cd.bin -print -quit)" boot/limine/limine-uefi-cd.bin
+      - name: Compile and test
+        run: make clean test
+      - name: Build ISO
+        run: ./build-iso.sh
+      - name: Name image and checksum
+        run: |
+          set -eu
+          mv build/GenOS-Genesis-x86_64.iso "build/GenOS-V3-${{ matrix.edition }}-x86_64.iso"
+          (cd build && sha256sum "GenOS-V3-${{ matrix.edition }}-x86_64.iso" > "SHA256SUMS-V3-${{ matrix.edition }}.txt")
+          (cd build && sha256sum --check "SHA256SUMS-V3-${{ matrix.edition }}.txt")
+      - name: BIOS boot smoke test in QEMU
+        run: |
+          set -eu
+          xvfb-run -a qemu-system-x86_64 -machine pc -m 512M -vga std -cdrom "build/GenOS-V3-${{ matrix.edition }}-x86_64.iso" -boot d -serial file:/tmp/genos-serial.log -display gtk -no-reboot -no-shutdown >/tmp/genos-qemu.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 30); do
+            if grep -q "GENKERNEL BOOTED" /tmp/genos-serial.log 2>/dev/null; then exit 0; fi
+            if ! kill -0 "$pid" 2>/dev/null; then cat /tmp/genos-qemu.log; cat /tmp/genos-serial.log 2>/dev/null || true; exit 1; fi
+            sleep 1
+          done
+          cat /tmp/genos-qemu.log
+          cat /tmp/genos-serial.log 2>/dev/null || true
+          exit 1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GenOS-V3-${{ matrix.edition }}
+          path: |
+            build/GenOS-V3-${{ matrix.edition }}-x86_64.iso
+            build/SHA256SUMS-V3-${{ matrix.edition }}.txt
+          if-no-files-found: error
+          retention-days: 90
