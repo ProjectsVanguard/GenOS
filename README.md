@@ -114,5 +114,5 @@ Ainda faltam componentes fundamentais de um sistema operacional de uso geral, in
 A seção abaixo é atualizada automaticamente pelo GitHub Actions quando alterações relevantes são enviadas para `main`. Para mudanças funcionais, atualize também manualmente as seções de estado, build e limitações, para que a documentação descreva o comportamento real — não apenas a existência de um commit.
 
 <!-- README-AUTO-UPDATE:START -->
-- Última atualização automática: 2026-10-26T21:38:00-03:00 UTC — commit [`84fe882`](https://github.com/ProjectsVanguard/GenOS/commit/84fe882ba8b014f78e7530f18fa14fbf6c26165f) — Fix Limine binary discovery in GenOS V3 CI
+- Última atualização automática: 2026-10-26T21:54:18-03:00 UTC — commit [`22f1463`](https://github.com/ProjectsVanguard/GenOS/commit/22f14638e27e84a1502da6f8ace7a4b33de6b670) — Merge pull request #7 from ProjectsVanguard/feat/ultimate-python-cmd
 <!-- README-AUTO-UPDATE:END -->
