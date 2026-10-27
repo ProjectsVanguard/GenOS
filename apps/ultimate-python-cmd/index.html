@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Python CMD — GenOS Ultimate</title>
+<style>
+:root{color-scheme:dark;--bg:#080d14;--panel:#101a27;--line:#23364a;--green:#70f0b0;--blue:#72baff;--text:#e6edf5;--muted:#91a4b8}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#193452 0,#080d14 55%);color:var(--text);font:15px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;min-height:100vh;padding:24px}
+main{max-width:1000px;margin:auto;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#080d14eF;box-shadow:0 24px 90px #0009}
+header{padding:16px 20px;background:linear-gradient(100deg,#182b42,#101a27);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+h1{font:600 18px system-ui;margin:0}small,.muted{color:var(--muted)}.pill{border:1px solid #28674d;color:var(--green);border-radius:999px;padding:4px 10px;font-size:12px}
+#console{height:min(58vh,560px);min-height:300px;overflow:auto;padding:20px;white-space:pre-wrap;overflow-wrap:anywhere}
+.line{margin:0 0 8px}.prompt{color:var(--green)}.output{color:#c7d8e8}.error{color:#ff9999}.system{color:var(--blue)}
+form{display:flex;gap:10px;padding:12px 16px;border-top:1px solid var(--line);background:#0e1722}label{color:var(--green);padding-top:8px}input{min-width:0;flex:1;background:transparent;color:var(--text);border:0;outline:0;font:inherit}button{border:1px solid #315170;background:#17314b;color:white;border-radius:8px;padding:8px 13px;cursor:pointer}button:hover{background:#21466a}.tools{display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px;border-top:1px solid var(--line)}footer{padding:12px 20px;border-top:1px solid var(--line);font:12px system-ui;color:var(--muted)}
+</style></head>
+<body><main>
+<header><div><h1>⌘ Python CMD <span class="muted">/ GenOS Ultimate</span></h1><small>Console de desenvolvimento experimental</small></div><span class="pill" id="runtime">Python: carregando runtime…</span></header>
+<div id="console" role="log" aria-live="polite"><p class="line system">GenOS Ultimate — Python CMD 1.0</p><p class="line system">Digite help() para ver os comandos. Experimente: print("Olá, GenOS!")</p><p class="line muted">Carregando Python via Pyodide (WebAssembly). A primeira inicialização precisa de internet.</p></div>
+<form id="form"><label for="cmd">>>></label><input id="cmd" autocomplete="off" autofocus spellcheck="false" placeholder='print("Olá, mundo!")'><button>Executar</button></form>
+<div class="tools"><button type="button" id="clear">Limpar tela</button><button type="button" id="examples">Exemplo Python</button><button type="button" id="updates">get-updates</button></div>
+<footer>Python real no navegador via Pyodide/WASM quando o runtime carrega. Não é um shell do kernel, não altera arquivos do host nem instala pacotes no GenOS. Runtime externo requer conexão.</footer>
+</main>
+<script>
+const out=document.querySelector('#console'),input=document.querySelector('#cmd'),form=document.querySelector('#form'),status=document.querySelector('#runtime');
+let pyodide=null,history=[],histIndex=0;
+function line(text,kind='output'){const p=document.createElement('p');p.className='line '+kind;p.textContent=text;out.appendChild(p);out.scrollTop=out.scrollHeight}
+function help(){return 'Comandos especiais: help(), clear(), about(), get_updates()\nPython: print, variáveis, listas, loops, funções e bibliotecas incluídas no Pyodide.'}
+window.help=help;window.about=()=> 'GenOS Ultimate — edição experimental x86-64. Python CMD é um app web, não um runtime nativo do kernel.';window.get_updates=()=>{line('Abrindo página de releases do GenOS…','system');window.open('https://github.com/ProjectsVanguard/GenOS/releases/latest','_blank','noopener');return 'Confira releases e notas. Este app não instala atualizações automaticamente.'};
+async function boot(){try{if(!window.loadPyodide){await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js';s.onload=resolve;s.onerror=reject;document.head.appendChild(s)})}pyodide=await loadPyodide();status.textContent='Python 3 · pronto';status.style.color='var(--green)';line('Runtime Python inicializado com sucesso.','system')}catch(e){status.textContent='Python indisponível offline';line('Não foi possível carregar o runtime Python. Verifique a internet e recarregue.','error')}}
+async function run(src){if(!src.trim())return;line('>>> '+src,'prompt');if(/^clear\(\)$/.test(src.trim())){out.innerHTML='';return}if(/^help\(\)$/.test(src.trim())){line(help());return}if(/^about\(\)$/.test(src.trim())){line(about());return}if(/^get_updates\(\)$/.test(src.trim())){line(get_updates());return}
+if(!pyodide){line('Runtime Python ainda não está disponível. Tente novamente quando o status mudar.','error');return}
+try{let result=await pyodide.runPythonAsync(src);if(result!==undefined&&result!==null&&String(result)!=='None')line(String(result))}catch(e){line(String(e),'error')}}
+form.addEventListener('submit',async e=>{e.preventDefault();const src=input.value;input.value='';history.push(src);histIndex=history.length;await run(src);input.focus()});
+input.addEventListener('keydown',e=>{if(e.key==='ArrowUp'){e.preventDefault();histIndex=Math.max(0,histIndex-1);input.value=history[histIndex]||''}if(e.key==='ArrowDown'){e.preventDefault();histIndex=Math.min(history.length,histIndex+1);input.value=history[histIndex]||''}});
+document.querySelector('#clear').onclick=()=>out.innerHTML='';document.querySelector('#examples').onclick=()=>{input.value='for n in range(1, 6):\n    print(f"GenOS Python {n}")';input.focus()};document.querySelector('#updates').onclick=()=>get_updates();boot();
+</script></body></html>
