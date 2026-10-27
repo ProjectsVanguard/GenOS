@@ -6,7 +6,7 @@ ID_RE=re.compile(r'^[a-z0-9]+(?:[.-][a-z0-9]+)*$')
 
 def safe_name(name):
     p=pathlib.PurePosixPath(name)
-    return bool(name) and not p.is_absolute() and '..' not in p.parts and '\\\\' not in name and not name.startswith('/')
+    return bool(name) and not p.is_absolute() and '..' not in p.parts and '\\' not in name and not name.startswith('/')
 
 def load_manifest(z):
     try: m=json.loads(z.read('manifest.json'))
