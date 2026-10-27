@@ -81,5 +81,5 @@ Ainda faltam componentes fundamentais de um sistema operacional de uso geral, in
 A seção abaixo é atualizada automaticamente pelo GitHub Actions quando alterações relevantes são enviadas para `main`. Para mudanças funcionais, atualize também manualmente as seções de estado, build e limitações, para que a documentação descreva o comportamento real — não apenas a existência de um commit.
 
 <!-- README-AUTO-UPDATE:START -->
-- Última atualização automática: 2026-10-26T21:16:00-03:00 UTC — commit [`b64d0c3`](https://github.com/ProjectsVanguard/GenOS/commit/b64d0c3a71512a097780a3e6fd3b3ab07ee61f94) — feat: add interactive GenOS Core browser preview
+- Última atualização automática: 2026-10-26T21:16:02-03:00 UTC — commit [`03496ca`](https://github.com/ProjectsVanguard/GenOS/commit/03496cabd8fe7cb551a52adfda4170cd5c2d54ac) — ci: deploy Core preview via GitHub Pages
 <!-- README-AUTO-UPDATE:END -->
