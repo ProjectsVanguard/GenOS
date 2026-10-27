@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """GenOS .gem package tool. Format v1 is a ZIP container, not RubyGems."""
-import argparse, hashlib, json, os, pathlib, re, shutil, sys, tempfile, zipfile
+import argparse, hashlib, json, pathlib, re, shutil, sys, tempfile, zipfile
 FORMAT='gem'; VERSION=1
 ID_RE=re.compile(r'^[a-z0-9]+(?:[.-][a-z0-9]+)*$')
 
@@ -44,12 +44,15 @@ def pack(src,out):
     validate(out)
     print(f'Pacote criado: {out} ({out.stat().st_size} bytes)')
 
+def read_package(path):
+    with zipfile.ZipFile(path) as z: return load_manifest(z)
+
 def validate(path):
-    with zipfile.ZipFile(path) as z:
-        m=load_manifest(z)
-        print(json.dumps({'valid':True,'id':m['id'],'name':m['name'],'version':m['version'],'entrypoint':m['entrypoint']},ensure_ascii=False,indent=2))
+    m=read_package(path)
+    print(json.dumps({'valid':True,'id':m['id'],'name':m['name'],'version':m['version'],'entrypoint':m['entrypoint']},ensure_ascii=False,indent=2))
 
 def install(path,dest):
+    path=pathlib.Path(path).resolve()
     dest=pathlib.Path(dest).resolve()
     with zipfile.ZipFile(path) as z:
         m=load_manifest(z)
@@ -67,21 +70,56 @@ def install(path,dest):
                 else:
                     out.parent.mkdir(parents=True,exist_ok=True)
                     with z.open(info) as src, open(out,'wb') as dst: shutil.copyfileobj(src,dst)
-            (tmp/'INSTALLATION.json').write_text(json.dumps({'installed_from':str(pathlib.Path(path).name),'sha256':hashlib.sha256(pathlib.Path(path).read_bytes()).hexdigest()},indent=2))
+            (tmp/'INSTALLATION.json').write_text(json.dumps({'installed_from':path.name,'sha256':hashlib.sha256(path.read_bytes()).hexdigest()},indent=2))
             tmp.rename(target)
     print(f"Instalado {m['name']} em {target}")
 
+def list_installed(root):
+    root=pathlib.Path(root).resolve()
+    if not root.exists():
+        print(f'Nenhum aplicativo instalado em {root}')
+        return
+    found=0
+    for manifest in sorted(root.glob('*/manifest.json')):
+        try:
+            m=json.loads(manifest.read_text(encoding='utf-8'))
+            if not (manifest.parent/'INSTALLATION.json').is_file(): continue
+            print(f"{m.get('id','?')}\t{m.get('version','?')}\t{m.get('name','?')}")
+            found+=1
+        except (OSError, ValueError):
+            print(f'AVISO: manifesto inválido: {manifest}',file=sys.stderr)
+    if not found: print(f'Nenhum aplicativo instalado em {root}')
+
+def remove(app_id,root):
+    if not ID_RE.fullmatch(app_id): raise ValueError('id inválido')
+    root=pathlib.Path(root).resolve()
+    target=(root/app_id).resolve()
+    if root not in target.parents: raise ValueError('destino fora do diretório de aplicativos')
+    marker=target/'INSTALLATION.json'
+    if not marker.is_file() or not (target/'manifest.json').is_file():
+        raise ValueError(f'aplicativo instalado/gerenciado não encontrado: {app_id}')
+    # Refuse to follow symlinked installation targets.
+    if target.is_symlink(): raise ValueError('não é permitido remover destino que seja link simbólico')
+    shutil.rmtree(target)
+    print(f'Removido {app_id} de {target}')
+
 def main():
-    p=argparse.ArgumentParser(description='Ferramenta oficial de pacotes GenOS .gem')
+    p=argparse.ArgumentParser(description='Gerenciador experimental de pacotes GenOS .gem')
     s=p.add_subparsers(dest='cmd',required=True)
     a=s.add_parser('pack'); a.add_argument('source'); a.add_argument('-o','--output',required=True)
     a=s.add_parser('validate'); a.add_argument('package')
+    a=s.add_parser('info'); a.add_argument('package')
     a=s.add_parser('install'); a.add_argument('package'); a.add_argument('--root',default='./Applications')
+    a=s.add_parser('list'); a.add_argument('--root',default='./Applications')
+    a=s.add_parser('remove'); a.add_argument('app_id'); a.add_argument('--root',default='./Applications')
     x=p.parse_args()
     try:
         if x.cmd=='pack': pack(x.source,x.output)
         elif x.cmd=='validate': validate(x.package)
-        else: install(x.package,x.root)
+        elif x.cmd=='info': print(json.dumps(read_package(x.package),ensure_ascii=False,indent=2))
+        elif x.cmd=='install': install(x.package,x.root)
+        elif x.cmd=='list': list_installed(x.root)
+        elif x.cmd=='remove': remove(x.app_id,x.root)
     except (ValueError, OSError, zipfile.BadZipFile, KeyError) as e:
         print(f'ERRO: {e}',file=sys.stderr); return 2
     return 0

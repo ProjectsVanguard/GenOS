@@ -1,5 +1,21 @@
 # GenOS Genesis — GenKernel, GenUI e pacotes .gem
 
+## GenOS Store e gerenciador de pacotes .gem
+
+A loja de aplicativos web está em [apps/app-store](apps/app-store/) e foi adicionada à [GenOS Suite](apps/genos-suite/index.html) e ao desktop de demonstração. Para gerar e gerenciar o pacote da loja no computador de desenvolvimento:
+
+```sh
+make app-store-gem
+python3 tools/gem/genpkg.py validate build/org.genos.app-store.gem
+python3 tools/gem/genpkg.py info build/org.genos.app-store.gem
+python3 tools/gem/genpkg.py install build/org.genos.app-store.gem --root ./Applications
+python3 tools/gem/genpkg.py list --root ./Applications
+python3 tools/gem/genpkg.py remove org.genos.app-store --root ./Applications
+```
+
+O gerenciador extrai pacotes para um diretório de aplicativos controlado e oferece listar/remover instalações gerenciadas. **Limites atuais:** isso ainda roda no host de desenvolvimento; não está integrado ao kernel bare-metal. O botão “Instalar” na loja web salva apenas uma seleção no navegador. Os pacotes .gem não têm assinatura criptográfica nem sandbox, e os apps HTML não são executáveis nativos. Instale apenas pacotes confiáveis. O workflow [Validate GenOS Store and .gem packages](.github/workflows/validate-app-store.yml) testa o ciclo do pacote.
+
+
 O GenOS é um sistema operacional experimental próprio para x86-64, não uma distribuição Linux. Este repositório contém o código-fonte inicial, ferramentas de desenvolvimento e protótipos de aplicativos.
 
 ## Terminal CMD do GenOS

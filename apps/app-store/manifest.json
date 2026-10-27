@@ -1,0 +1,17 @@
+{
+  "format": "gem",
+  "format_version": 1,
+  "id": "org.genos.app-store",
+  "name": "GenOS Store",
+  "version": "1.0.0",
+  "description": "Catálogo web experimental de aplicativos GenOS.",
+  "author": "Projeto GenOS",
+  "entrypoint": "index.html",
+  "architecture": [
+    "x86_64"
+  ],
+  "min_genos_version": "0.1.0",
+  "permissions": [],
+  "runtime": "web-prototype",
+  "notes": "Instalar registra pacotes no navegador apenas; instalação nativa exige gerenciador .gem e runtime compatível."
+}
