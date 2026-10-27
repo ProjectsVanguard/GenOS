@@ -10,7 +10,7 @@ O GenOS é um sistema operacional experimental próprio para x86-64, não uma di
   <a href="https://github.com/ProjectsVanguard/GenOS/releases/latest"><img alt="Baixar GenOS Enterprise" src="https://img.shields.io/badge/Download-GenOS%20Enterprise-0f766e?style=for-the-badge&logo=github"></a>
 </p>
 
-> **Status:** as três edições Core, Ultimate e Enterprise ainda não foram publicadas como ISOs independentes. Os botões abrem a página de releases; os downloads específicos de cada edição serão disponibilizados quando os builds correspondentes existirem e passarem nos testes. Não considere uma edição disponível apenas porque o botão aparece.
+> **GenOS V3:** o workflow [Build GenOS V3 edition ISOs](https://github.com/ProjectsVanguard/GenOS/actions/workflows/build-iso-v3.yml) agora prepara ISOs separadas para Home, Ultimate e Enterprise LTSC, executa testes de compilação/pacotes e um smoke test de boot BIOS no QEMU. A release só é publicada se as três variantes passarem. Até a release V3 aparecer abaixo, considere os builds ainda em validação. As edições compartilham o mesmo kernel e payload; os nomes identificam perfis experimentais, não conjuntos de recursos distintos. Enterprise LTSC não implica garantia de suporte prolongado.
 
 [Ver todas as releases e downloads](https://github.com/ProjectsVanguard/GenOS/releases)
 
