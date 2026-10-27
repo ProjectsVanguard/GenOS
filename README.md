@@ -143,5 +143,5 @@ Ainda faltam componentes fundamentais de um sistema operacional de uso geral, in
 A seção abaixo é atualizada automaticamente pelo GitHub Actions quando alterações relevantes são enviadas para `main`. Para mudanças funcionais, atualize também manualmente as seções de estado, build e limitações, para que a documentação descreva o comportamento real — não apenas a existência de um commit.
 
 <!-- README-AUTO-UPDATE:START -->
-- Última atualização automática: 2026-10-26T22:21:37-03:00 UTC — commit [`32c91d2`](https://github.com/ProjectsVanguard/GenOS/commit/32c91d25224f39c68043e513b25b0f6be8cb9661) — Include x86_64 UEFI bootloader in GenOS ISO
+- Última atualização automática: 2026-10-26T22:21:40-03:00 UTC — commit [`31ad6a4`](https://github.com/ProjectsVanguard/GenOS/commit/31ad6a4b27f54aa13a527e598f6a021b318c53f5) — Fix UEFI smoke test firmware loading and validate EFI bootloader
 <!-- README-AUTO-UPDATE:END -->
