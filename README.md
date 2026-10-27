@@ -14,6 +14,14 @@ O GenOS é um sistema operacional experimental próprio para x86-64, não uma di
 
 [Ver todas as releases e downloads](https://github.com/ProjectsVanguard/GenOS/releases)
 
+## Experimentar o GenOS Core antes de baixar
+
+<p align="center">
+  <a href="https://projectsvanguard.github.io/GenOS/core-preview/"><img alt="Experimentar GenOS Core no navegador" src="https://img.shields.io/badge/Experimentar-GenOS%20Core%20Online-16a34a?style=for-the-badge&logo=googlechrome"></a>
+</p>
+
+A [prévia interativa do GenOS Core](https://projectsvanguard.github.io/GenOS/core-preview/) demonstra uma área de trabalho com menu, janelas, notas, calculadora e terminal simulado. **É uma simulação web:** não inicia o GenKernel, não executa a ISO nem valida a compatibilidade do sistema. A publicação depende de GitHub Pages estar habilitado e do workflow [Publish GenOS Core web preview](https://github.com/ProjectsVanguard/GenOS/actions/workflows/core-preview-pages.yml) terminar com sucesso.
+
 ## Gerar a ISO de teste
 
 O GitHub Actions tenta construir automaticamente uma ISO híbrida BIOS/UEFI a cada alteração relevante na branch `main`.
