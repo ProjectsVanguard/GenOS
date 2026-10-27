@@ -25,6 +25,17 @@ C:\\GenOS&gt; _</font></pre>
 
 > Este bloco é uma ilustração visual do terminal; os comandos acima não são executados pelo README nem representam um shell nativo completo.
 
+## Compatibilidade de arquitetura e firmware
+
+| Plataforma | Estado atual |
+|---|---|
+| AMD64 / x86-64 | Arquitetura do kernel atual; alvo de build das ISOs V3. |
+| BIOS legado (AMD64) | Teste de inicialização automatizado no QEMU. |
+| UEFI x86-64 | A ISO inclui suporte de boot UEFI; o workflow agora também executa um smoke test UEFI no QEMU. Aguarde a execução ficar verde para considerar esse teste confirmado. |
+| ARM / AArch64 | **Ainda não suportado pelo kernel.** Exige port de arquitetura, linker/entrada de kernel, acesso a serial/console e uma imagem/boot chain próprios; uma ISO AMD64 não inicializa em ARM. |
+
+> AMD64 é o nome da arquitetura x86-64 e não significa apenas processadores AMD: CPUs Intel 64 também pertencem a essa família. BIOS e UEFI são modos de firmware, não arquiteturas de CPU. A inclusão do teste UEFI ainda precisa passar no GitHub Actions; não representa validação em hardware físico.
+
 ## Downloads das edições GenOS
 
 <p align="center">
@@ -35,7 +46,7 @@ C:\\GenOS&gt; _</font></pre>
 
 Os botões abrem a página da **release mais recente**, onde você pode baixar os arquivos que já foram publicados. Os links diretos para arquivos V3 retornavam “página não encontrada” porque esses nomes ainda não estão disponíveis em uma release. Depois que o build V3 publicar as três ISOs, os links diretos poderão ser ativados com os nomes confirmados dos arquivos.
 
-> **GenOS V3:** o workflow [Build GenOS V3 edition ISOs](https://github.com/ProjectsVanguard/GenOS/actions/workflows/build-iso-v3.yml) agora prepara ISOs separadas para Home, Ultimate e Enterprise LTSC, executa testes de compilação/pacotes e um smoke test de boot BIOS no QEMU. A release só é publicada se as três variantes passarem. Até a release V3 aparecer abaixo, considere os builds ainda em validação. As edições compartilham o mesmo kernel e payload; os nomes identificam perfis experimentais, não conjuntos de recursos distintos. Enterprise LTSC não implica garantia de suporte prolongado.
+> **GenOS V3:** o workflow [Build GenOS V3 edition ISOs](https://github.com/ProjectsVanguard/GenOS/actions/workflows/build-iso-v3.yml) agora prepara ISOs separadas para Home, Ultimate e Enterprise LTSC, executa testes de compilação/pacotes e smoke tests de boot BIOS e UEFI no QEMU. A release só é publicada se as três variantes passarem. O teste de UEFI precisa passar no workflow atualizado; ARM/AArch64 continua sem suporte. As edições compartilham o mesmo kernel e payload; os nomes identificam perfis experimentais, não conjuntos de recursos distintos. Enterprise LTSC não implica garantia de suporte prolongado.
 
 [Ver todas as releases e downloads](https://github.com/ProjectsVanguard/GenOS/releases)
 
