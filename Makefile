@@ -25,3 +25,22 @@ test: all suite-gem
 	python3 -m py_compile tools/gem/genpkg.py
 clean:
 	rm -rf build
+
+# Experimental ARMv6 (ARM1176JZF-S) cross-build; separate from the x86_64 default.
+ARM_CC ?= arm-none-eabi-gcc
+ARM_OBJCOPY ?= arm-none-eabi-objcopy
+ARM_CFLAGS = -std=c11 -O2 -Wall -Wextra -Werror -ffreestanding -fno-stack-protector -fno-pic -fno-pie -mcpu=arm1176jzf-s -marm
+ARM_LDFLAGS = -nostdlib -Wl,-T,arch/armv6/linker.ld -Wl,--build-id=none
+.PHONY: armv6
+armv6: build/armv6/genos-armv6.elf build/armv6/kernel.img
+build/armv6:
+	mkdir -p $@
+build/armv6/boot.o: arch/armv6/boot.S | build/armv6
+	$(ARM_CC) $(ARM_CFLAGS) -c $< -o $@
+build/armv6/kernel.o: arch/armv6/kernel.c | build/armv6
+	$(ARM_CC) $(ARM_CFLAGS) -c $< -o $@
+build/armv6/genos-armv6.elf: build/armv6/boot.o build/armv6/kernel.o arch/armv6/linker.ld
+	$(ARM_CC) $(ARM_CFLAGS) $(ARM_LDFLAGS) build/armv6/boot.o build/armv6/kernel.o -o $@
+	arm-none-eabi-readelf -h $@ | grep -q 'Machine:.*ARM'
+build/armv6/kernel.img: build/armv6/genos-armv6.elf
+	$(ARM_OBJCOPY) -O binary $< $@
