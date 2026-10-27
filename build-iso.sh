@@ -7,10 +7,14 @@ for f in boot/limine/limine boot/limine/limine-bios.sys boot/limine/limine-bios-
 done
 [[ -x boot/limine/limine ]] || chmod +x boot/limine/limine
 make all
+edition="$(printenv GENOS_EDITION 2>/dev/null || true)"
+version="$(printenv GENOS_VERSION 2>/dev/null || true)"
+edition="${edition:-Genesis}"
+version="${version:-3.0.0-preview}"
 mkdir -p build/iso-root/boot/limine build/iso-root/Applications
 cp build/kernel.elf build/iso-root/boot/kernel.elf
 # Python CMD is exclusive to the Ultimate preview image.
-if [[ "${edition:-Genesis}" == "Ultimate" ]]; then
+if [[ "$edition" == "Ultimate" ]]; then
   cp -a apps/. build/iso-root/Applications/
 else
   cp -a apps/. build/iso-root/Applications/
@@ -18,10 +22,6 @@ else
 fi
 cp boot/limine.conf build/iso-root/boot/limine/limine.conf
 cp boot/limine/limine-bios.sys boot/limine/limine-bios-cd.bin boot/limine/limine-uefi-cd.bin build/iso-root/boot/limine/
-edition="$(printenv GENOS_EDITION 2>/dev/null || true)"
-version="$(printenv GENOS_VERSION 2>/dev/null || true)"
-edition="${edition:-Genesis}"
-version="${version:-3.0.0-preview}"
 cat > build/iso-root/GENOS-EDITION.txt <<EOF
 GenOS V3 — ${edition}
 Version: ${version}
