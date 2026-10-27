@@ -2,6 +2,29 @@
 
 O GenOS é um sistema operacional experimental próprio para x86-64, não uma distribuição Linux. Este repositório contém o código-fonte inicial, ferramentas de desenvolvimento e protótipos de aplicativos.
 
+## Terminal CMD do GenOS
+
+<p align="center">
+  <table>
+    <tr>
+      <td bgcolor="#0c0c0c">
+        <pre><font color="#00ff66">GenOS CMD [versão 3.0.0-preview]
+(c) GenOS Project. Protótipo experimental.
+
+C:\\GenOS&gt; help
+Comandos demonstrativos: help, about, clear, get-updates
+
+C:\\GenOS&gt; about
+GenOS — sistema operacional experimental x86-64
+
+C:\\GenOS&gt; _</font></pre>
+      </td>
+    </tr>
+  </table>
+</p>
+
+> Este bloco é uma ilustração visual do terminal; os comandos acima não são executados pelo README nem representam um shell nativo completo.
+
 ## Downloads das edições GenOS
 
 <p align="center">
