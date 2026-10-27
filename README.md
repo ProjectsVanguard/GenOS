@@ -127,5 +127,5 @@ Ainda faltam componentes fundamentais de um sistema operacional de uso geral, in
 A seção abaixo é atualizada automaticamente pelo GitHub Actions quando alterações relevantes são enviadas para `main`. Para mudanças funcionais, atualize também manualmente as seções de estado, build e limitações, para que a documentação descreva o comportamento real — não apenas a existência de um commit.
 
 <!-- README-AUTO-UPDATE:START -->
-- Última atualização automática: 2026-10-26T21:56:35-03:00 UTC — commit [`09dc451`](https://github.com/ProjectsVanguard/GenOS/commit/09dc451597b6eb0252e0b31b76a6deebea925245) — Expose downloadable release assets in GenOS demo terminal
+- Última atualização automática: 2026-10-26T22:07:24-03:00 UTC — commit [`28debcd`](https://github.com/ProjectsVanguard/GenOS/commit/28debcd0e7ba5a13a68413ae5af106f6681686a7) — Merge pull request #8 from ProjectsVanguard/feat/armv6-bringup
 <!-- README-AUTO-UPDATE:END -->
