@@ -1,5 +1,32 @@
 <!doctype html>
 <html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GenOS v2 — demonstração interativa</title>
+<script>
+/* Atualização automática da demonstração: sincroniza com a versão mais recente publicada em main. */
+(async function autoUpdateGenOSPreview(){
+  const repo = 'ProjectsVanguard/GenOS';
+  const path = 'apps/core-preview/index.html';
+  const key = 'genos-preview-latest-source-sha';
+  try {
+    const meta = await fetch('https://api.github.com/repos/' + repo + '/commits?path=' + encodeURIComponent(path) + '&per_page=1', {
+      cache: 'no-store', headers: { Accept: 'application/vnd.github+json' }
+    });
+    if (!meta.ok) return;
+    const commits = await meta.json();
+    const latestSha = commits && commits[0] && commits[0].sha;
+    if (!latestSha || sessionStorage.getItem(key) === latestSha) return;
+    const latest = await fetch('https://raw.githubusercontent.com/' + repo + '/main/' + path + '?v=' + latestSha, { cache: 'no-store' });
+    if (!latest.ok) return;
+    const html = await latest.text();
+    if (!html.includes('</html>')) return;
+    sessionStorage.setItem(key, latestSha);
+    document.open();
+    document.write(html);
+    document.close();
+  } catch (_) {
+    /* Se GitHub estiver indisponível ou offline, mantenha a demonstração já carregada. */
+  }
+})();
+</script>
 <style>
 :root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#eaf2ff}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 75% 20%,#284b8a,#101c38 58%,#080f21);min-height:100vh}.notice{background:#172744;padding:11px 16px;font-size:13px;border-bottom:1px solid #526587;text-align:center}.desktop{height:calc(100vh - 96px);min-height:380px;padding:25px;position:relative}.brand{position:absolute;right:30px;top:25px;font-size:22px;font-weight:700;opacity:.65}.icons{display:flex;flex-direction:column;gap:20px;width:110px}.appicon{border:0;background:transparent;color:white;cursor:pointer;padding:8px;border-radius:10px;font-size:14px}.appicon:hover,.appicon:focus-visible{background:#ffffff24}.appicon span{display:block;font-size:32px;margin-bottom:6px}.taskbar{height:53px;background:#111c35e8;display:flex;align-items:center;gap:10px;padding:7px 12px;border-top:1px solid #51688c}.taskbar button,.window button,.menu button{color:white;background:#29436f;border:1px solid #5c77a5;border-radius:7px;padding:8px 12px;cursor:pointer}.taskbar button:hover,.menu button:hover{background:#3b5d92}.clock{margin-left:auto}.menu{position:absolute;bottom:60px;left:12px;width:235px;background:#182949;border:1px solid #7290bb;border-radius:12px;padding:14px;box-shadow:0 12px 40px #0009}.menu button{display:block;width:100%;margin-top:8px;text-align:left}.window{position:absolute;left:50%;top:45%;transform:translate(-50%,-50%);width:min(590px,calc(100vw - 30px));background:#152441;border:1px solid #7392c5;border-radius:12px;box-shadow:0 18px 65px #000a;overflow:hidden}.titlebar{background:#284574;padding:10px 14px;display:flex;justify-content:space-between;align-items:center}.content{padding:20px;min-height:210px}.content textarea{width:100%;min-height:180px;resize:vertical;background:#0b162b;color:white;border:1px solid #6884b0;border-radius:8px;padding:12px}.content input{padding:9px;width:100%;background:#0b162b;color:white;border:1px solid #6884b0;border-radius:8px}.result{font-size:24px;margin:14px 0}.muted{color:#b5c7e7;font-size:13px}.terminal{font-family:monospace;background:#071123;padding:14px;border-radius:8px;line-height:1.7;white-space:pre-wrap}.hide{display:none!important}
 
