@@ -114,5 +114,5 @@ Ainda faltam componentes fundamentais de um sistema operacional de uso geral, in
 A seção abaixo é atualizada automaticamente pelo GitHub Actions quando alterações relevantes são enviadas para `main`. Para mudanças funcionais, atualize também manualmente as seções de estado, build e limitações, para que a documentação descreva o comportamento real — não apenas a existência de um commit.
 
 <!-- README-AUTO-UPDATE:START -->
-- Última atualização automática: 2026-10-26T21:54:18-03:00 UTC — commit [`22f1463`](https://github.com/ProjectsVanguard/GenOS/commit/22f14638e27e84a1502da6f8ace7a4b33de6b670) — Merge pull request #7 from ProjectsVanguard/feat/ultimate-python-cmd
+- Última atualização automática: 2026-10-26T21:56:29-03:00 UTC — commit [`869ae63`](https://github.com/ProjectsVanguard/GenOS/commit/869ae63e8ae6afc06d710381af1387f46b9035a9) — Make terminal get-update list downloadable release assets
 <!-- README-AUTO-UPDATE:END -->
