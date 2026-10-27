@@ -40,6 +40,7 @@ jobs:
           install -m 0644 "$(find /tmp/limine -name limine-bios.sys -print -quit)" boot/limine/limine-bios.sys
           install -m 0644 "$(find /tmp/limine -name limine-bios-cd.bin -print -quit)" boot/limine/limine-bios-cd.bin
           install -m 0644 "$(find /tmp/limine -name limine-uefi-cd.bin -print -quit)" boot/limine/limine-uefi-cd.bin
+          install -m 0644 "$(find /tmp/limine -name BOOTX64.EFI -print -quit)" boot/limine/BOOTX64.EFI
       - name: Compile and test
         run: make clean test
       - name: Build ISO
@@ -72,10 +73,12 @@ jobs:
       - name: UEFI boot smoke test in QEMU
         run: |
           set -eu
-          firmware="$(find /usr/share/OVMF -maxdepth 1 -type f \( -name 'OVMF_CODE.fd' -o -name 'OVMF_CODE_4M.fd' \) -print -quit)"
-          test -n "$firmware"
+          firmware="$(find /usr/share/OVMF -maxdepth 1 \( -type f -o -type l \) \( -name 'OVMF_CODE.fd' -o -name 'OVMF_CODE_4M.fd' \) -print -quit)"
+          test -n "$firmware" && test -r "$firmware"
+          test -f build/iso-root/EFI/BOOT/BOOTX64.EFI
+          ls -l "$firmware" build/iso-root/EFI/BOOT/BOOTX64.EFI
           rm -f /tmp/genos-uefi-serial.log /tmp/genos-uefi-qemu.log
-          xvfb-run -a qemu-system-x86_64 -machine q35 -m 512M -vga std -bios "$firmware" -cdrom "build/GenOS-V3-${{ matrix.edition }}-x86_64.iso" -boot d -serial file:/tmp/genos-uefi-serial.log -display gtk -no-reboot -no-shutdown >/tmp/genos-uefi-qemu.log 2>&1 &
+          xvfb-run -a qemu-system-x86_64 -machine q35 -m 512M -vga std -drive "if=pflash,format=raw,readonly=on,file=$firmware" -cdrom "build/GenOS-V3-${{ matrix.edition }}-x86_64.iso" -boot d -serial file:/tmp/genos-uefi-serial.log -display gtk -no-reboot -no-shutdown >/tmp/genos-uefi-qemu.log 2>&1 &
           pid=$!
           trap 'kill "$pid" 2>/dev/null || true' EXIT
           for attempt in $(seq 1 30); do
