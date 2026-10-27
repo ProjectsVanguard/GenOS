@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 for c in xorriso; do command -v "$c" >/dev/null || { echo "Falta ferramenta: $c" >&2; exit 2; }; done
-for f in boot/limine/limine boot/limine/limine-bios.sys boot/limine/limine-bios-cd.bin boot/limine/limine-uefi-cd.bin; do
+for f in boot/limine/limine boot/limine/limine-bios.sys boot/limine/limine-bios-cd.bin boot/limine/limine-uefi-cd.bin boot/limine/BOOTX64.EFI; do
   [[ -f "$f" ]] || { echo "Falta arquivo oficial do Limine: $f" >&2; exit 2; }
 done
 [[ -x boot/limine/limine ]] || chmod +x boot/limine/limine
@@ -22,6 +22,8 @@ else
 fi
 cp boot/limine.conf build/iso-root/boot/limine/limine.conf
 cp boot/limine/limine-bios.sys boot/limine/limine-bios-cd.bin boot/limine/limine-uefi-cd.bin build/iso-root/boot/limine/
+mkdir -p build/iso-root/EFI/BOOT
+cp boot/limine/BOOTX64.EFI build/iso-root/EFI/BOOT/BOOTX64.EFI
 cat > build/iso-root/GENOS-EDITION.txt <<EOF
 GenOS V3 — ${edition}
 Version: ${version}
