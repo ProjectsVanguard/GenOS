@@ -91,5 +91,5 @@ Ainda faltam componentes fundamentais de um sistema operacional de uso geral, in
 A seção abaixo é atualizada automaticamente pelo GitHub Actions quando alterações relevantes são enviadas para `main`. Para mudanças funcionais, atualize também manualmente as seções de estado, build e limitações, para que a documentação descreva o comportamento real — não apenas a existência de um commit.
 
 <!-- README-AUTO-UPDATE:START -->
-- Última atualização automática: 2026-10-26T21:36:36-03:00 UTC — commit [`0a446f3`](https://github.com/ProjectsVanguard/GenOS/commit/0a446f3fcb6aff070746e0b755da913ba7d17b49) — Support Limine executable symlinks in CI
+- Última atualização automática: 2026-10-26T21:38:00-03:00 UTC — commit [`84fe882`](https://github.com/ProjectsVanguard/GenOS/commit/84fe882ba8b014f78e7530f18fa14fbf6c26165f) — Fix Limine binary discovery in GenOS V3 CI
 <!-- README-AUTO-UPDATE:END -->
