@@ -91,5 +91,5 @@ Ainda faltam componentes fundamentais de um sistema operacional de uso geral, in
 A seção abaixo é atualizada automaticamente pelo GitHub Actions quando alterações relevantes são enviadas para `main`. Para mudanças funcionais, atualize também manualmente as seções de estado, build e limitações, para que a documentação descreva o comportamento real — não apenas a existência de um commit.
 
 <!-- README-AUTO-UPDATE:START -->
-- Última atualização automática: 2026-10-26T21:35:42-03:00 UTC — commit [`002bb3e`](https://github.com/ProjectsVanguard/GenOS/commit/002bb3efcba5de41448963144fc7d18abe3bbcc0) — Build, test and publish three GenOS V3 edition ISOs
+- Última atualização automática: 2026-10-26T21:36:26-03:00 UTC — commit [`6bdd71c`](https://github.com/ProjectsVanguard/GenOS/commit/6bdd71cfb848621313ff8959e4d4b6147b287c5e) — Handle Limine binary release layout changes
 <!-- README-AUTO-UPDATE:END -->
