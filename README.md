@@ -66,13 +66,13 @@ Os botões abrem a página da **release mais recente**, onde você pode baixar o
 
 [Ver todas as releases e downloads](https://github.com/ProjectsVanguard/GenOS/releases)
 
-## Experimentar o GenOS v2 antes de baixar
+## Experimentar o GenOS V3 antes de baixar
 
 <p align="center">
-  <a href="https://projectsvanguard.github.io/GenOS/core-preview/"><img alt="Experimentar GenOS v2 no navegador" src="https://img.shields.io/badge/Experimentar-GenOS%20v2%20Online-16a34a?style=for-the-badge&logo=googlechrome"></a>
+  <a href="https://projectsvanguard.github.io/GenOS/core-preview/"><img alt="Experimentar GenOS V3 no navegador" src="https://img.shields.io/badge/Experimentar-GenOS%20V3%20Online-16a34a?style=for-the-badge&logo=googlechrome"></a>
 </p>
 
-A [demonstração interativa do GenOS v2](https://projectsvanguard.github.io/GenOS/core-preview/) demonstra uma área de trabalho com menu, janelas, notas, calculadora, terminal simulado, arquivos, configurações, Paint, calendário, monitor ilustrativo, relógio e pacotes .gem. **É uma simulação web:** não inicia o GenKernel, não executa a ISO nem valida a compatibilidade do sistema. A publicação depende de GitHub Pages estar habilitado e do workflow [Publish GenOS Core web preview](https://github.com/ProjectsVanguard/GenOS/actions/workflows/core-preview-pages.yml) terminar com sucesso.
+A [demonstração interativa do GenOS V3](https://projectsvanguard.github.io/GenOS/core-preview/) demonstra uma área de trabalho com menu, janelas, notas, calculadora, terminal simulado, arquivos, configurações, Paint, calendário, monitor ilustrativo, relógio e pacotes .gem. **É uma simulação web:** não inicia o GenKernel, não executa a ISO nem valida a compatibilidade do sistema. A publicação depende de GitHub Pages estar habilitado e do workflow [Publish GenOS Core web preview](https://github.com/ProjectsVanguard/GenOS/actions/workflows/core-preview-pages.yml) terminar com sucesso.
 
 A demonstração inclui o comando `get-updates` (também aceita `get-update`) no terminal. Ele consulta a última release pública e mostra atalhos para os canais de atualização do site, ISOs, pacotes e kernel. **É um verificador/atalho, não um instalador universal:** atualizações do kernel/ISO não podem ser aplicadas pelo navegador e exigem os procedimentos de build/instalação correspondentes.
 
