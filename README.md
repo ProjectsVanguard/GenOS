@@ -28,12 +28,12 @@ C:\\GenOS&gt; _</font></pre>
 ## Downloads das edições GenOS
 
 <p align="center">
-  <a href="https://github.com/ProjectsVanguard/GenOS/releases/latest/download/GenOS-V3-Home-x86_64.iso"><img alt="Baixar ISO mais recente do GenOS Home" src="https://img.shields.io/badge/Download-GenOS%20Home-2563eb?style=for-the-badge&logo=github"></a>
-  <a href="https://github.com/ProjectsVanguard/GenOS/releases/latest/download/GenOS-V3-Ultimate-x86_64.iso"><img alt="Baixar ISO mais recente do GenOS Ultimate" src="https://img.shields.io/badge/Download-GenOS%20Ultimate-7c3aed?style=for-the-badge&logo=github"></a>
-  <a href="https://github.com/ProjectsVanguard/GenOS/releases/latest/download/GenOS-V3-Enterprise-LTSC-x86_64.iso"><img alt="Baixar ISO mais recente do GenOS Enterprise LTSC" src="https://img.shields.io/badge/Download-GenOS%20Enterprise%20LTSC-0f766e?style=for-the-badge&logo=github"></a>
+  <a href="https://github.com/ProjectsVanguard/GenOS/releases/latest"><img alt="Baixar ISO mais recente do GenOS Home" src="https://img.shields.io/badge/Download-GenOS%20Home-2563eb?style=for-the-badge&logo=github"></a>
+  <a href="https://github.com/ProjectsVanguard/GenOS/releases/latest"><img alt="Baixar ISO mais recente do GenOS Ultimate" src="https://img.shields.io/badge/Download-GenOS%20Ultimate-7c3aed?style=for-the-badge&logo=github"></a>
+  <a href="https://github.com/ProjectsVanguard/GenOS/releases/latest"><img alt="Baixar ISO mais recente do GenOS Enterprise LTSC" src="https://img.shields.io/badge/Download-GenOS%20Enterprise%20LTSC-0f766e?style=for-the-badge&logo=github"></a>
 </p>
 
-Cada botão aponta diretamente para o arquivo ISO correspondente na **release mais recente**. Quando uma nova release publicar um arquivo com o mesmo nome, o link passa a entregar automaticamente a versão nova, sem precisar editar o README. Se ainda não existir uma release com esse arquivo, o download não estará disponível até a publicação do build.
+Os botões abrem a página da **release mais recente**, onde você pode baixar os arquivos que já foram publicados. Os links diretos para arquivos V3 retornavam “página não encontrada” porque esses nomes ainda não estão disponíveis em uma release. Depois que o build V3 publicar as três ISOs, os links diretos poderão ser ativados com os nomes confirmados dos arquivos.
 
 > **GenOS V3:** o workflow [Build GenOS V3 edition ISOs](https://github.com/ProjectsVanguard/GenOS/actions/workflows/build-iso-v3.yml) agora prepara ISOs separadas para Home, Ultimate e Enterprise LTSC, executa testes de compilação/pacotes e um smoke test de boot BIOS no QEMU. A release só é publicada se as três variantes passarem. Até a release V3 aparecer abaixo, considere os builds ainda em validação. As edições compartilham o mesmo kernel e payload; os nomes identificam perfis experimentais, não conjuntos de recursos distintos. Enterprise LTSC não implica garantia de suporte prolongado.
 
