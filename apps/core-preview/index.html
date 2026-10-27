@@ -2,6 +2,27 @@
 <html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GenOS Core — prévia interativa</title>
 <style>
 :root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#eaf2ff}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 75% 20%,#284b8a,#101c38 58%,#080f21);min-height:100vh}.notice{background:#172744;padding:11px 16px;font-size:13px;border-bottom:1px solid #526587;text-align:center}.desktop{height:calc(100vh - 96px);min-height:380px;padding:25px;position:relative}.brand{position:absolute;right:30px;top:25px;font-size:22px;font-weight:700;opacity:.65}.icons{display:flex;flex-direction:column;gap:20px;width:110px}.appicon{border:0;background:transparent;color:white;cursor:pointer;padding:8px;border-radius:10px;font-size:14px}.appicon:hover,.appicon:focus-visible{background:#ffffff24}.appicon span{display:block;font-size:32px;margin-bottom:6px}.taskbar{height:53px;background:#111c35e8;display:flex;align-items:center;gap:10px;padding:7px 12px;border-top:1px solid #51688c}.taskbar button,.window button,.menu button{color:white;background:#29436f;border:1px solid #5c77a5;border-radius:7px;padding:8px 12px;cursor:pointer}.taskbar button:hover,.menu button:hover{background:#3b5d92}.clock{margin-left:auto}.menu{position:absolute;bottom:60px;left:12px;width:235px;background:#182949;border:1px solid #7290bb;border-radius:12px;padding:14px;box-shadow:0 12px 40px #0009}.menu button{display:block;width:100%;margin-top:8px;text-align:left}.window{position:absolute;left:50%;top:45%;transform:translate(-50%,-50%);width:min(590px,calc(100vw - 30px));background:#152441;border:1px solid #7392c5;border-radius:12px;box-shadow:0 18px 65px #000a;overflow:hidden}.titlebar{background:#284574;padding:10px 14px;display:flex;justify-content:space-between;align-items:center}.content{padding:20px;min-height:210px}.content textarea{width:100%;min-height:180px;resize:vertical;background:#0b162b;color:white;border:1px solid #6884b0;border-radius:8px;padding:12px}.content input{padding:9px;width:100%;background:#0b162b;color:white;border:1px solid #6884b0;border-radius:8px}.result{font-size:24px;margin:14px 0}.muted{color:#b5c7e7;font-size:13px}.terminal{font-family:monospace;background:#071123;padding:14px;border-radius:8px;line-height:1.7;white-space:pre-wrap}.hide{display:none!important}
+
+/* GenOS Core: wallpaper futurista, leve e responsivo */
+body{background:#080e24;overflow-x:hidden}
+.desktop{isolation:isolate;overflow:hidden;background:
+ radial-gradient(ellipse at 75% 38%,rgba(73,162,255,.38),transparent 32%),
+ radial-gradient(ellipse at 27% 78%,rgba(121,63,233,.32),transparent 45%),
+ linear-gradient(135deg,#070d20 3%,#13234a 48%,#0b1633 100%)}
+.desktop::before{content:"";position:absolute;z-index:-1;inset:-15%;pointer-events:none;background:
+ repeating-linear-gradient(0deg,transparent 0 51px,rgba(132,187,255,.075) 52px,transparent 53px),
+ repeating-linear-gradient(90deg,transparent 0 51px,rgba(132,187,255,.075) 52px,transparent 53px);
+ transform:perspective(680px) rotateX(57deg) scale(1.4) translateY(15%);transform-origin:center bottom;
+ mask-image:linear-gradient(to top,#000,transparent 78%)}
+.desktop::after{content:"";position:absolute;z-index:-1;width:min(57vw,680px);aspect-ratio:1;right:8%;top:7%;border-radius:50%;pointer-events:none;background:
+ radial-gradient(circle at 36% 30%,rgba(255,255,255,.9) 0,rgba(138,212,255,.7) 2%,transparent 9%),
+ radial-gradient(circle at 38% 34%,#74c6ff 0%,#2773db 28%,#173b94 49%,#0b1b49 69%,transparent 71%);
+ box-shadow:0 0 75px 25px rgba(39,132,255,.22),inset -30px -35px 70px rgba(4,11,42,.75);opacity:.9}
+.brand{font-size:clamp(24px,4vw,48px);letter-spacing:.06em;text-shadow:0 2px 30px #0008}
+.notice{position:relative;z-index:2;background:linear-gradient(90deg,#142343,#203b6d);border-bottom-color:#6b90c0}
+.taskbar{position:relative;z-index:3;backdrop-filter:blur(14px);background:#0a1634e8}
+.window,.menu{z-index:4;backdrop-filter:blur(16px);background:#132542ed}
+@media(max-width:640px){.desktop::after{width:85vw;right:-20%;top:20%;opacity:.55}.brand{right:16px;top:18px}.icons{gap:9px}.desktop{padding:15px}}
 </style></head><body>
 <div class="notice"><strong>PRÉVIA WEB DO GENOS CORE</strong> — Simulação interativa de interface. Não inicializa o kernel, não executa a ISO e não representa um teste real de hardware.</div>
 <main class="desktop"><div class="brand">GenOS <span style="font-weight:400">Core</span></div>
