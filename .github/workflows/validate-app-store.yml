@@ -1,0 +1,36 @@
+name: Validate GenOS Store and .gem packages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/app-store/**"
+      - "apps/genos-suite/**"
+      - "apps/core-preview/**"
+      - "tools/gem/**"
+      - "tests/test_gem.sh"
+      - "Makefile"
+      - ".github/workflows/validate-app-store.yml"
+  pull_request:
+    paths:
+      - "apps/app-store/**"
+      - "apps/genos-suite/**"
+      - "apps/core-preview/**"
+      - "tools/gem/**"
+      - "tests/test_gem.sh"
+      - "Makefile"
+      - ".github/workflows/validate-app-store.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test .gem build, validation, install, list, and removal
+        run: bash tests/test_gem.sh
+      - name: Verify app-store manifest
+        run: python3 tools/gem/genpkg.py validate build/org.genos.app-store.gem
