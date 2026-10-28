@@ -1,0 +1,5 @@
+#include "net_parse.h"
+static uint16_t be16(const uint8_t*p){return (uint16_t)(((uint16_t)p[0]<<8)|p[1]);}
+int net_parse_ethernet(const void *packet,size_t n,net_frame_t*out){if(!packet||!out||n<14)return -1;const uint8_t*p=(const uint8_t*)packet;out->ethertype=be16(p+12);out->payload=p+14;out->payload_len=n-14;return 0;}
+uint16_t net_checksum16(const void *data,size_t n){if(!data)return 0;const uint8_t*p=(const uint8_t*)data;uint32_t sum=0;while(n>=2){sum+=be16(p);p+=2;n-=2;}if(n)sum+=(uint16_t)p[0]<<8;while(sum>>16)sum=(sum&0xffffU)+(sum>>16);return (uint16_t)~sum;}
+int net_parse_ipv4(const void *packet,size_t n,net_ipv4_t*out){if(!packet||!out||n<20)return -1;const uint8_t*p=(const uint8_t*)packet;if((p[0]>>4)!=4)return -1;size_t ihl=(size_t)(p[0]&15U)*4U;if(ihl<20||ihl>n)return -1;size_t total=be16(p+2);if(total<ihl||total>n)return -1;if(net_checksum16(p,ihl)!=0)return -1;/* Fragmented packets are not reassembled in this first-stage parser. */uint16_t frag=be16(p+6);if((frag&0x3fffU)!=0)return -1;for(size_t i=0;i<4;i++){out->src[i]=p[12+i];out->dst[i]=p[16+i];}out->protocol=p[9];out->payload=p+ihl;out->payload_len=total-ihl;return 0;}
