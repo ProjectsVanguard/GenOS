@@ -149,5 +149,5 @@ Ainda faltam componentes fundamentais de um sistema operacional de uso geral, in
 A seção abaixo é atualizada automaticamente pelo GitHub Actions quando alterações relevantes são enviadas para `main`. Para mudanças funcionais, atualize também manualmente as seções de estado, build e limitações, para que a documentação descreva o comportamento real — não apenas a existência de um commit.
 
 <!-- README-AUTO-UPDATE:START -->
-- Última atualização automática: 2026-10-28T11:49:46-03:00 UTC — commit [`c2f943d`](https://github.com/ProjectsVanguard/GenOS/commit/c2f943d9966e1f091e6785563583ea3c6c0ede49) — Unify V3 kernel UI checks, edition builds, BIOS/UEFI smoke tests and release publishing
+- Última atualização automática: 2026-10-28T11:55:23-03:00 UTC — commit [`9a60d6e`](https://github.com/ProjectsVanguard/GenOS/commit/9a60d6eaf1cb87db3596b292a6e5a30c0429a7e9) — Add bounded VFS and initramfs interfaces
 <!-- README-AUTO-UPDATE:END -->
