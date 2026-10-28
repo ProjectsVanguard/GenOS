@@ -10,6 +10,7 @@ Este documento registra o trabalho necessário para transformar a ISO experiment
 - [ ] Criar CI para testes unitários de componentes do kernel e boot regressivo.
 
 ## 1. GenUI nativa
+- [x] Protótipo inicial: leitura por polling do teclado PS/2 e menu framebuffer alternável com Enter/Esc (sem suporte a USB, mouse ou janelas reais; validação de build/boot pendente).
 - [ ] Separar primitivas de framebuffer (pixel, retângulo, fonte, clipping) do kernel principal.
 - [ ] Implementar framebuffer com stride e formatos de pixel verificados, backbuffer e atualização parcial.
 - [ ] Inicializar teclado e mouse via drivers apropriados e fila de eventos.
