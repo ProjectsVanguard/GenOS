@@ -89,6 +89,12 @@ Também é possível iniciar uma compilação manual em **Actions → Build GenO
 
 A imagem deve ser considerada uma **ISO de teste experimental**. O fluxo compila o GenKernel, gera a ISO com Limine e verifica o arquivo/checksum. A conclusão do build não substitui um teste visual completo em QEMU/VirtualBox e em hardware real. Teste primeiro em máquina virtual. A ISO não instala o GenOS nem deve ser usada para particionar o disco interno.
 
+## GenUI 3.0, sistema de arquivos, rede, USB e aplicativos nativos
+
+O roteiro de evolução está em [GenUI 3.0 e subsistemas nativos](docs/GENUI-3.0-NATIVE-SUBSYSTEMS.md). Ele organiza o trabalho para a nova interface nativa, VFS/sistema de arquivos, rede, USB e runtime de aplicativos nativos.
+
+**Estado real:** GenUI 3.0 é a meta de desenvolvimento, não uma versão concluída. O kernel tem framebuffer e um protótipo de menu com polling de teclado PS/2. Sistema de arquivos funcional, pilha de rede, suporte USB completo e aplicativos executados nativamente ainda não estão implementados. A demonstração web e os pacotes .gem no host não substituem esses componentes. Cada subsistema será anunciado como suportado somente depois de integrado ao kernel/ISO e testado no QEMU.
+
 ## Estado atual
 
 - O kernel C freestanding para x86-64 solicita framebuffer ao Limine e desenha uma tela experimental. O protótipo de GenUI inclui menu com navegação por teclado PS/2 em polling; a interação ainda precisa de validação visual/runtime dedicada no QEMU e não é uma interface completa.
