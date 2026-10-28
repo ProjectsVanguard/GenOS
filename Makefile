@@ -21,7 +21,10 @@ build/org.genos.suite.gem: FORCE apps/genos-suite/index.html tools/gem/build_sui
 	python3 tools/gem/build_suite.py $@
 build/org.genos.app-store.gem: FORCE apps/app-store/index.html apps/app-store/manifest.json tools/gem/genpkg.py | build
 	python3 tools/gem/genpkg.py pack apps/app-store -o $@
-subsystem-test: | build\n\t$(CC) -std=c11 -O2 -Wall -Wextra -Werror -I. tests/test_subsystems.c kernel/subsystems/vfs.c kernel/subsystems/net_parse.c kernel/subsystems/usb_desc.c genui/genui3.c -o build/test_subsystems\n\t./build/test_subsystems\ntest: all suite-gem app-store-gem subsystem-test
+subsystem-test: | build
+	$(CC) -std=c11 -O2 -Wall -Wextra -Werror -I. tests/test_subsystems.c kernel/subsystems/vfs.c kernel/subsystems/net_parse.c kernel/subsystems/usb_desc.c genui/genui3.c -o build/test_subsystems
+	./build/test_subsystems
+test: all suite-gem app-store-gem subsystem-test
 	python3 tools/gem/genpkg.py validate build/org.genos.hello.gem
 	python3 tools/gem/genpkg.py validate build/org.genos.suite.gem
 	python3 tools/gem/genpkg.py validate build/org.genos.app-store.gem
