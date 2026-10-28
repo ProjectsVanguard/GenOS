@@ -143,5 +143,5 @@ Ainda faltam componentes fundamentais de um sistema operacional de uso geral, in
 A seção abaixo é atualizada automaticamente pelo GitHub Actions quando alterações relevantes são enviadas para `main`. Para mudanças funcionais, atualize também manualmente as seções de estado, build e limitações, para que a documentação descreva o comportamento real — não apenas a existência de um commit.
 
 <!-- README-AUTO-UPDATE:START -->
-- Última atualização automática: 2026-10-28T11:47:12-03:00 UTC — commit [`eedb314`](https://github.com/ProjectsVanguard/GenOS/commit/eedb314dd38711329451d10d817472b8a68f016f) — Track initial native keyboard-driven UI prototype
+- Última atualização automática: 2026-10-28T11:48:33-03:00 UTC — commit [`c675a57`](https://github.com/ProjectsVanguard/GenOS/commit/c675a578d6d02a80d9912c91c8b263bcef85f102) — Extend native framebuffer menu with keyboard navigation and status panels
 <!-- README-AUTO-UPDATE:END -->
