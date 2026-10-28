@@ -149,5 +149,5 @@ Ainda faltam componentes fundamentais de um sistema operacional de uso geral, in
 A seção abaixo é atualizada automaticamente pelo GitHub Actions quando alterações relevantes são enviadas para `main`. Para mudanças funcionais, atualize também manualmente as seções de estado, build e limitações, para que a documentação descreva o comportamento real — não apenas a existência de um commit.
 
 <!-- README-AUTO-UPDATE:START -->
-- Última atualização automática: 2026-10-28T11:56:50-03:00 UTC — commit [`bc90383`](https://github.com/ProjectsVanguard/GenOS/commit/bc903838c5285d40f2905f6725e33d434ed18b96) — Add host subsystem tests to build
+- Última atualização automática: 2026-10-28T11:56:55-03:00 UTC — commit [`528c922`](https://github.com/ProjectsVanguard/GenOS/commit/528c922130e7a657e264087d317cafb278087678) — Add tests for VFS GenUI USB and packet parsing
 <!-- README-AUTO-UPDATE:END -->
