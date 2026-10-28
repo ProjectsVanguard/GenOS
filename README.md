@@ -149,5 +149,5 @@ Ainda faltam componentes fundamentais de um sistema operacional de uso geral, in
 A seção abaixo é atualizada automaticamente pelo GitHub Actions quando alterações relevantes são enviadas para `main`. Para mudanças funcionais, atualize também manualmente as seções de estado, build e limitações, para que a documentação descreva o comportamento real — não apenas a existência de um commit.
 
 <!-- README-AUTO-UPDATE:START -->
-- Última atualização automática: 2026-10-28T11:55:29-03:00 UTC — commit [`5b639b1`](https://github.com/ProjectsVanguard/GenOS/commit/5b639b167324a79c69efb1cf5d5339cf80fb6896) — Add defensive Ethernet IPv4 ICMP packet parser
+- Última atualização automática: 2026-10-28T11:55:32-03:00 UTC — commit [`05058b2`](https://github.com/ProjectsVanguard/GenOS/commit/05058b2dcdc682075b1f404c150a18e31e9b6a17) — Implement bounds-checked Ethernet and IPv4 parsing
 <!-- README-AUTO-UPDATE:END -->
