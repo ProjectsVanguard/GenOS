@@ -49,14 +49,17 @@ jobs:
           bios_sys="$(find /tmp/limine-dist -type f -name limine-bios.sys -print -quit)"
           bios_cd="$(find /tmp/limine-dist -type f -name limine-bios-cd.bin -print -quit)"
           uefi_cd="$(find /tmp/limine-dist -type f -name limine-uefi-cd.bin -print -quit)"
+          uefi_efi="$(find /tmp/limine-dist -type f -name BOOTX64.EFI -print -quit)"
           test -n "$limine_bin" || { echo "::error::Limine CLI not found"; exit 1; }
           test -n "$bios_sys" || { echo "::error::limine-bios.sys not found"; exit 1; }
           test -n "$bios_cd" || { echo "::error::limine-bios-cd.bin not found"; exit 1; }
           test -n "$uefi_cd" || { echo "::error::limine-uefi-cd.bin not found"; exit 1; }
+          test -n "$uefi_efi" || { echo "::error::BOOTX64.EFI not found in official Limine archive"; exit 1; }
           install -m 0755 "$limine_bin" boot/limine/limine
           install -m 0644 "$bios_sys" boot/limine/limine-bios.sys
           install -m 0644 "$bios_cd" boot/limine/limine-bios-cd.bin
           install -m 0644 "$uefi_cd" boot/limine/limine-uefi-cd.bin
+          install -m 0644 "$uefi_efi" boot/limine/BOOTX64.EFI
           boot/limine/limine --version
 
       - name: Compile kernel and run package tests
