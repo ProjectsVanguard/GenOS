@@ -6,6 +6,10 @@ on:
     paths:
       - 'boot/**'
       - 'build-iso.sh'
+      - '.github/workflows/build-iso.yml'
+      - '.github/workflows/build-iso-v3.yml'
+      - 'tests/**'
+      - 'genui/**'
       - 'Makefile'
   pull_request:
     paths:
@@ -13,6 +17,8 @@ on:
       - 'Makefile'
       - 'boot/**'
       - 'build-iso.sh'
+      - 'tests/**'
+      - 'genui/**'
   workflow_dispatch:
 
 permissions:
