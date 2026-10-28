@@ -48,7 +48,8 @@ static int name83(const uint8_t*raw,char*out){
 }
 static int equal_fold(const char*a,const char*b){while(*a&&*b){char x=*a++,y=*b++;if(x>='a'&&x<='z')x=(char)(x-'a'+'A');if(y>='a'&&y<='z')y=(char)(y-'a'+'A');if(x!=y)return 0;}return *a==*b;}
 int fat32_find_root(const fat32_volume_t*v,const char*want,fat32_entry_t*out){
-    if(!v||!want||!out)return -1;uint32_t c=v->root_cluster;
+    if(!v||!want||!out) return -1;
+    uint32_t c=v->root_cluster;
     for(uint32_t steps=0;steps<v->cluster_count;steps++){
         uint32_t first;if(cluster_sector(v,c,&first))return -1;
         for(uint32_t si=0;si<v->sectors_per_cluster;si++){const uint8_t*p;if(sector(v,first+si,&p))return -1;
