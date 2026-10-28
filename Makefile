@@ -24,6 +24,8 @@ build/org.genos.app-store.gem: FORCE apps/app-store/index.html apps/app-store/ma
 subsystem-test: | build
 	$(CC) -std=c11 -O2 -Wall -Wextra -Werror -I. tests/test_subsystems.c kernel/subsystems/vfs.c kernel/subsystems/net_parse.c kernel/subsystems/usb_desc.c genui/genui3.c -o build/test_subsystems
 	./build/test_subsystems
+	$(CC) -std=c11 -O2 -Wall -Wextra -Werror -I. tests/test_fat32.c kernel/subsystems/fat32.c -o build/test_fat32
+	./build/test_fat32
 test: all suite-gem app-store-gem subsystem-test
 	python3 tools/gem/genpkg.py validate build/org.genos.hello.gem
 	python3 tools/gem/genpkg.py validate build/org.genos.suite.gem
