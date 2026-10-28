@@ -6,6 +6,10 @@ on:
     branches: [main]
     paths: ['kernel/**', 'boot/**', 'apps/**', 'Makefile', 'build-iso.sh', 'installer/v3/editions/**', '.github/workflows/build-iso-v3.yml']
 
+concurrency:
+  group: genos-v3-${{ github.ref }}
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
@@ -43,6 +47,22 @@ jobs:
           install -m 0644 "$(find /tmp/limine -name BOOTX64.EFI -print -quit)" boot/limine/BOOTX64.EFI
       - name: Compile and test
         run: make clean test
+      - name: Verify native GenUI integration
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          source = Path("kernel/kernel.c").read_text()
+          required = (
+              "keyboard_poll_loop();", "native_panel(", "native_detail(",
+              "scancode==0x1cU", "scancode==0x01U",
+              "scancode==0x48U", "scancode==0x50U",
+              "GENKERNEL BOOTED",
+          )
+          missing = [token for token in required if token not in source]
+          if missing:
+              raise SystemExit(f"Native GenUI integration missing: {missing}")
+          print("Native GenUI source integration checks passed (not an input-device runtime test)")
+          PY
       - name: Build ISO
         env:
           GENOS_EDITION: ${{ matrix.edition }}
@@ -55,6 +75,8 @@ jobs:
           mv build/GenOS-Genesis-x86_64.iso "build/GenOS-V3-${{ matrix.edition }}-x86_64.iso"
           (cd build && sha256sum "GenOS-V3-${{ matrix.edition }}-x86_64.iso" > "SHA256SUMS-V3-${{ matrix.edition }}.txt")
           (cd build && sha256sum --check "SHA256SUMS-V3-${{ matrix.edition }}.txt")
+          test -s build/kernel.elf
+          test -s "build/GenOS-V3-${{ matrix.edition }}-x86_64.iso"
       - name: BIOS boot smoke test in QEMU
         run: |
           set -eu
@@ -117,9 +139,9 @@ jobs:
           target_commitish: ${{ github.sha }}
           body: |
             Separate GenOS V3 preview ISO builds: Home, Ultimate and Enterprise LTSC.
-            Each image passed compilation/package tests and BIOS QEMU boot smoke testing before publication.
+            Each image passed compilation/package tests, native GenUI source integration checks, and BIOS/UEFI QEMU boot smoke tests before publication.
             Edition labels are metadata profiles only; edition-specific functionality is not implemented yet.
-            Enterprise LTSC is not a long-term-support commitment. UEFI and physical hardware are not validated by the BIOS QEMU test.
+            Enterprise LTSC is not a long-term-support commitment. Physical hardware and keyboard interaction are not validated by these QEMU boot smoke tests.\n            Native GenUI remains an early framebuffer/PS2 keyboard prototype; storage, network, USB, audio, processes and full apps are not implemented.
             Verify the supplied SHA256SUMS files before use.
           files: |
             dist/GenOS-V3-Home-x86_64.iso
