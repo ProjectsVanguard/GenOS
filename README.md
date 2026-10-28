@@ -149,5 +149,5 @@ Ainda faltam componentes fundamentais de um sistema operacional de uso geral, in
 A seção abaixo é atualizada automaticamente pelo GitHub Actions quando alterações relevantes são enviadas para `main`. Para mudanças funcionais, atualize também manualmente as seções de estado, build e limitações, para que a documentação descreva o comportamento real — não apenas a existência de um commit.
 
 <!-- README-AUTO-UPDATE:START -->
-- Última atualização automática: 2026-10-28T12:17:18-03:00 UTC — commit [`21cffd6`](https://github.com/ProjectsVanguard/GenOS/commit/21cffd6a02ad38fd49cf01c55f2093d5bf065a0e) — Connect FAT32 file reads to VFS
+- Última atualização automática: 2026-10-28T12:17:24-03:00 UTC — commit [`0bd08ec`](https://github.com/ProjectsVanguard/GenOS/commit/0bd08eca00c151005eeb8b2f4fc5e0570462111a) — Test FAT32 imports into VFS
 <!-- README-AUTO-UPDATE:END -->
