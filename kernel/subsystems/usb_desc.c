@@ -1,0 +1,3 @@
+#include "usb_desc.h"
+int usb_descriptor_at(const void *buffer,size_t total,size_t offset,usb_descriptor_t*out){if(!buffer||!out||offset>total||total-offset<2)return -1;const uint8_t*p=(const uint8_t*)buffer+offset;uint8_t len=p[0];if(len<2||(size_t)len>total-offset)return -1;out->length=len;out->type=p[1];out->bytes=p;return 0;}
+int usb_find_interface(const void *buffer,size_t total,uint8_t number,uint8_t*cls,uint8_t*sub,uint8_t*proto){if(!buffer||!cls||!sub||!proto)return -1;size_t off=0;while(off<total){usb_descriptor_t d;if(usb_descriptor_at(buffer,total,off,&d))return -1;if(d.type==4&&d.length>=9&&d.bytes[2]==number){*cls=d.bytes[5];*sub=d.bytes[6];*proto=d.bytes[7];return 0;}off+=d.length;}return -1;}
