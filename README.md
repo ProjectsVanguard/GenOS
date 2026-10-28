@@ -149,5 +149,5 @@ Ainda faltam componentes fundamentais de um sistema operacional de uso geral, in
 A seção abaixo é atualizada automaticamente pelo GitHub Actions quando alterações relevantes são enviadas para `main`. Para mudanças funcionais, atualize também manualmente as seções de estado, build e limitações, para que a documentação descreva o comportamento real — não apenas a existência de um commit.
 
 <!-- README-AUTO-UPDATE:START -->
-- Última atualização automática: 2026-10-28T11:59:50-03:00 UTC — commit [`f7af0c0`](https://github.com/ProjectsVanguard/GenOS/commit/f7af0c00076b799907faadfd30d95c2d059a7247) — Correct malformed USB descriptor test offset
+- Última atualização automática: 2026-10-28T12:02:50-03:00 UTC — commit [`6cad0ae`](https://github.com/ProjectsVanguard/GenOS/commit/6cad0aec9683d888b4acc0e8f3aad9e4d9e89722) — Install Limine UEFI loader required by ISO builder
 <!-- README-AUTO-UPDATE:END -->
