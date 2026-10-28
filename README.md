@@ -93,7 +93,7 @@ A imagem deve ser considerada uma **ISO de teste experimental**. O fluxo compila
 
 O roteiro de evolução está em [GenUI 3.0 e subsistemas nativos](docs/GENUI-3.0-NATIVE-SUBSYSTEMS.md). Ele organiza o trabalho para a nova interface nativa, VFS/sistema de arquivos, rede, USB e runtime de aplicativos nativos.
 
-**Estado real:** GenUI 3.0 é a meta de desenvolvimento, não uma versão concluída. O kernel tem framebuffer e um protótipo de menu com polling de teclado PS/2. Sistema de arquivos funcional, pilha de rede, suporte USB completo e aplicativos executados nativamente ainda não estão implementados. A demonstração web e os pacotes .gem no host não substituem esses componentes. Cada subsistema será anunciado como suportado somente depois de integrado ao kernel/ISO e testado no QEMU.
+**Estado real:** GenUI 3.0 continua em desenvolvimento. Foram adicionados núcleos C host-testáveis: VFS em memória somente leitura e parser de initramfs, parser Ethernet/IPv4, validação de descritores USB, modelo de janelas/eventos e protótipos de aplicativos. Eles ainda não estão conectados ao boot nem são drivers de hardware: não há conectividade de rede, controlador USB funcional, compositor GenUI integrado, syscalls, modo usuário ou carregador ELF. A demonstração web e os pacotes .gem no host não substituem esses componentes. Os testes host-side estão disponíveis em `make subsystem-test`; suporte real só será declarado após integração e testes QEMU/hardware.
 
 ## Estado atual
 
@@ -142,7 +142,7 @@ O pacote resultante é `build/org.genos.suite.gem`. Consulte [o guia da suíte](
 
 ## Limitações conhecidas
 
-Ainda faltam componentes fundamentais de um sistema operacional de uso geral, incluindo escalonador completo, gerência de memória virtual própria, syscalls e processos em modo usuário, sistema de arquivos, rede e runtime nativo de aplicativos. GenUI permanece experimental. O pacote `.gem` não tem assinatura, resolução de dependências ou sandbox. Não há suporte funcional a executáveis Windows `.exe`/Wine.
+Ainda faltam componentes fundamentais de um sistema operacional de uso geral, incluindo escalonador completo, gerência de memória virtual própria, syscalls e processos em modo usuário, integração da VFS com armazenamento, drivers de rede/USB e runtime nativo de aplicativos. Os núcleos host-testáveis atuais não significam suporte a dispositivos físicos. GenUI permanece experimental. O pacote `.gem` não tem assinatura, resolução de dependências ou sandbox. Não há suporte funcional a executáveis Windows `.exe`/Wine.
 
 ## Manutenção deste README
 
