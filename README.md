@@ -149,5 +149,5 @@ Ainda faltam componentes fundamentais de um sistema operacional de uso geral, in
 A seção abaixo é atualizada automaticamente pelo GitHub Actions quando alterações relevantes são enviadas para `main`. Para mudanças funcionais, atualize também manualmente as seções de estado, build e limitações, para que a documentação descreva o comportamento real — não apenas a existência de um commit.
 
 <!-- README-AUTO-UPDATE:START -->
-- Última atualização automática: 2026-10-28T11:55:44-03:00 UTC — commit [`3ec33a4`](https://github.com/ProjectsVanguard/GenOS/commit/3ec33a40a340252bbaee28a15414ec4c7dd3577f) — Implement USB descriptor bounds validation
+- Última atualização automática: 2026-10-28T11:56:15-03:00 UTC — commit [`048528a`](https://github.com/ProjectsVanguard/GenOS/commit/048528a4bb2388cd8c4b55a95ad1fe777d4f8a04) — Define native app ABI milestone and starter apps
 <!-- README-AUTO-UPDATE:END -->
