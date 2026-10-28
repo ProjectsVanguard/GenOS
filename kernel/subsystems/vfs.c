@@ -15,3 +15,17 @@ int vfs_list(const vfs_t*fs,const char*dir,size_t index,vfs_node_t*out){if(!vali
 static uint32_t le32(const uint8_t*p){return (uint32_t)p[0]|((uint32_t)p[1]<<8)|((uint32_t)p[2]<<16)|((uint32_t)p[3]<<24);}
 /* GNRD v1: magic, u32 count LE, then path length/path/u32 data length/data. */
 int initramfs_mount(vfs_t*fs,const void*image,size_t size){if(!fs||!image||size<8)return -1;const uint8_t*p=(const uint8_t*)image;if(p[0]!='G'||p[1]!='N'||p[2]!='R'||p[3]!='D')return -1;uint32_t count=le32(p+4);if(count>VFS_MAX_NODES-1)return -1;size_t off=8;if(vfs_init(fs))return -1;for(uint32_t i=0;i<count;i++){if(off>=size)return -1;size_t plen=p[off++];if(plen<2||plen>=VFS_PATH_MAX||plen>size-off)return -1;char path[VFS_PATH_MAX];for(size_t j=0;j<plen;j++)path[j]=(char)p[off+j];path[plen]=0;off+=plen;if(size-off<4)return -1;uint32_t len=le32(p+off);off+=4;if(len>size-off||len>VFS_FILE_MAX||!valid_path(path))return -1;if(vfs_add_file(fs,path,p+off,len))return -1;off+=len;}return off==size?0:-1;}
+
+/* FAT32 adapter: payload remains in caller-owned storage, as VFS is immutable. */
+int vfs_import_fat32_root_file(vfs_t *fs,const fat32_volume_t *volume,
+                               const char *short_name,const char *vfs_path,
+                               void *storage,size_t storage_capacity){
+    if(!fs||!volume||!short_name||!vfs_path||!storage)return -1;
+    fat32_entry_t entry;
+    if(fat32_find_root(volume,short_name,&entry)!=0)return -1;
+    if(entry.size>VFS_FILE_MAX||entry.size>storage_capacity)return -1;
+    size_t bytes=0;
+    if(fat32_read_file(volume,&entry,storage,storage_capacity,&bytes)!=0)return -1;
+    if(bytes!=entry.size)return -1;
+    return vfs_add_file(fs,vfs_path,storage,bytes);
+}
