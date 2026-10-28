@@ -28,35 +28,70 @@ static uint8_t io_in8(uint16_t port){
     __asm__ volatile("inb %1,%0":"=a"(value):"Nd"(port));
     return value;
 }
-static void native_panel(uint8_t open){
+/* Native framebuffer interaction prototype. Keyboard scan set 1 is assumed. */
+static void native_panel(uint8_t open, uint8_t selected){
     if(!fb)return;
     desktop();
     if(open){
-        int x=(int)width/2-170, y=(int)height/2-90;
-        rect(x,y,340,180,color(23,34,54));
+        int x=(int)width/2-170, y=(int)height/2-112;
+        rect(x,y,340,224,color(23,34,54));
         rect(x,y,340,4,color(115,220,170));
-        text(x+20,y+22,"GENOS NATIVE MENU",color(255,255,255),2);
-        text(x+20,y+72,"ENTER: TOGGLE MENU",color(200,220,245),1);
-        text(x+20,y+94,"ESC: CLOSE MENU",color(200,220,245),1);
-        text(x+20,y+126,"KEYBOARD: PS/2 POLLING",color(115,220,170),1);
+        text(x+20,y+18,"GENOS NATIVE MENU",color(255,255,255),2);
+        const char *items[3]={"ABOUT GENOS","SYSTEM STATUS","KEYBOARD HELP"};
+        for(int i=0;i<3;i++){
+            int iy=y+62+i*35;
+            if((uint8_t)i==selected)rect(x+12,iy-6,316,29,color(47,91,166));
+            text(x+24,iy,items[i],color(255,255,255),2);
+        }
+        text(x+20,y+184,"UP/DOWN: SELECT  ENTER: OPEN",color(200,220,245),1);
+        text(x+20,y+200,"ESC: CLOSE",color(200,220,245),1);
     }
     text(18,18,"GENOS / GENKERNEL 0.1",color(255,255,255),2);
     text(18,42,"EXPERIMENTAL KERNEL - NATIVE UI PROTOTYPE",color(230,230,245),1);
 }
+static void native_detail(uint8_t selected){
+    int x=(int)width/2-170,y=(int)height/2-112;
+    native_panel(1,selected);
+    rect(x+12,y+62,316,115,color(14,22,42));
+    if(selected==0){
+        text(x+20,y+78,"GENOS V3 PREVIEW",color(255,255,255),2);
+        text(x+20,y+112,"BARE METAL X86-64",color(115,220,170),1);
+    }else if(selected==1){
+        text(x+20,y+78,"GENKERNEL RUNNING",color(255,255,255),2);
+        text(x+20,y+112,"FRAMEBUFFER ACTIVE",color(115,220,170),1);
+    }else{
+        text(x+20,y+78,"PS/2 KEYBOARD",color(255,255,255),2);
+        text(x+20,y+112,"ENTER ESC UP DOWN",color(115,220,170),1);
+    }
+    text(x+20,y+200,"ESC: BACK",color(200,220,245),1);
+}
 static void keyboard_poll_loop(void){
-    uint8_t menu_open=0;
+    uint8_t menu_open=0,selected=0,detail_open=0,extended=0;
     for(;;){
-        /* Read only when the PS/2 controller reports output available. */
+        /* Poll the controller; never interpret key releases as presses. */
         if(io_in8(0x64)&1U){
             uint8_t scancode=io_in8(0x60);
-            if(scancode==0x1cU){menu_open^=1U;native_panel(menu_open);}
-            else if(scancode==0x01U && menu_open){menu_open=0;native_panel(menu_open);}
+            if(scancode==0xe0U){extended=1;continue;}
+            if(scancode&0x80U){extended=0;continue;}
+            if(scancode==0x01U){
+                if(detail_open){detail_open=0;native_panel(1,selected);}
+                else if(menu_open){menu_open=0;native_panel(0,selected);}
+            }else if(scancode==0x1cU){
+                if(!menu_open){menu_open=1;selected=0;native_panel(1,selected);}
+                else if(!detail_open){detail_open=1;native_detail(selected);}
+            }else if(menu_open&&!detail_open&&(scancode==0x48U||scancode==0x50U)){
+                if(scancode==0x48U)selected=(uint8_t)((selected+2U)%3U);
+                else selected=(uint8_t)((selected+1U)%3U);
+                native_panel(1,selected);
+            }
+            extended=0;
         }
+        (void)extended; /* E0 arrows and legacy arrows share the same codes here. */
         __asm__ volatile("pause");
     }
 }
 static void serial_init(void){ __asm__ volatile("outb %0,%1"::"a"((uint8_t)0x00),"Nd"((uint16_t)0x3F9)); __asm__ volatile("outb %0,%1"::"a"((uint8_t)0x80),"Nd"((uint16_t)0x3FB)); __asm__ volatile("outb %0,%1"::"a"((uint8_t)0x03),"Nd"((uint16_t)0x3F8)); __asm__ volatile("outb %0,%1"::"a"((uint8_t)0x00),"Nd"((uint16_t)0x3F9)); __asm__ volatile("outb %0,%1"::"a"((uint8_t)0x03),"Nd"((uint16_t)0x3FB)); __asm__ volatile("outb %0,%1"::"a"((uint8_t)0xC7),"Nd"((uint16_t)0x3FA)); __asm__ volatile("outb %0,%1"::"a"((uint8_t)0x0B),"Nd"((uint16_t)0x3FC)); }
 static void serial_text(const char *s){ for(;*s;s++){ for(unsigned int i=0;i<1000000;i++){ uint8_t v; __asm__ volatile("inb %1,%0":"=a"(v):"Nd"((uint16_t)0x3FD)); if(v&0x20)break; } __asm__ volatile("outb %0,%1"::"a"((uint8_t)*s),"Nd"((uint16_t)0x3F8)); } }
 static void halt(void){ for(;;)__asm__ volatile("hlt"); }
-void genkernel_main(void){ serial_init(); serial_text("GENKERNEL ENTRY\\r\\n"); if(!LIMINE_BASE_REVISION_SUPPORTED){serial_text("LIMINE BASE REVISION UNSUPPORTED\\r\\n");halt();} if(!fb_req.response||!fb_req.response->framebuffer_count){serial_text("FRAMEBUFFER RESPONSE MISSING\\r\\n");halt();} fb=fb_req.response->framebuffers[0]; if(!fb||!fb->address||fb->bpp!=32||fb->width==0||fb->height==0||fb->width>8192||fb->height>8192||fb->pitch<fb->width*4U||(fb->pitch&3U)!=0){serial_text("SECURITY CHECK FAILED: INVALID FRAMEBUFFER\\r\\n");halt();} width=fb->width;height=fb->height;stride=fb->pitch/4;pixels=(volatile uint32_t*)fb->address; native_panel(0); serial_text("GENKERNEL BOOTED\\r\\n"); keyboard_poll_loop(); }
+void genkernel_main(void){ serial_init(); serial_text("GENKERNEL ENTRY\\r\\n"); if(!LIMINE_BASE_REVISION_SUPPORTED){serial_text("LIMINE BASE REVISION UNSUPPORTED\\r\\n");halt();} if(!fb_req.response||!fb_req.response->framebuffer_count){serial_text("FRAMEBUFFER RESPONSE MISSING\\r\\n");halt();} fb=fb_req.response->framebuffers[0]; if(!fb||!fb->address||fb->bpp!=32||fb->width==0||fb->height==0||fb->width>8192||fb->height>8192||fb->pitch<fb->width*4U||(fb->pitch&3U)!=0){serial_text("SECURITY CHECK FAILED: INVALID FRAMEBUFFER\\r\\n");halt();} width=fb->width;height=fb->height;stride=fb->pitch/4;pixels=(volatile uint32_t*)fb->address; native_panel(0,0); serial_text("GENKERNEL BOOTED\\r\\n"); keyboard_poll_loop(); }
 void _start(void){ genkernel_main(); }
