@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['kernel/**', 'boot/**', 'apps/**', 'Makefile', 'build-iso.sh', 'installer/v3/editions/**', '.github/workflows/build-iso-v3.yml']
+    paths: ['kernel/**', 'boot/**', 'apps/**', 'tests/**', 'genui/**', 'Makefile', 'build-iso.sh', 'installer/v3/editions/**', '.github/workflows/build-iso-v3.yml', '.github/workflows/build-iso.yml']
 
 concurrency:
   group: genos-v3-${{ github.ref }}
