@@ -149,5 +149,5 @@ Ainda faltam componentes fundamentais de um sistema operacional de uso geral, in
 A seção abaixo é atualizada automaticamente pelo GitHub Actions quando alterações relevantes são enviadas para `main`. Para mudanças funcionais, atualize também manualmente as seções de estado, build e limitações, para que a documentação descreva o comportamento real — não apenas a existência de um commit.
 
 <!-- README-AUTO-UPDATE:START -->
-- Última atualização automática: 2026-10-28T11:56:18-03:00 UTC — commit [`0081d6a`](https://github.com/ProjectsVanguard/GenOS/commit/0081d6a9248ed3ee0efa0e141234657cd5303b58) — Add native calculator logic prototype
+- Última atualização automática: 2026-10-28T11:56:21-03:00 UTC — commit [`439265d`](https://github.com/ProjectsVanguard/GenOS/commit/439265d206efb3693be3cba110242e4ebf4ec678) — Add native app entrypoint contract example
 <!-- README-AUTO-UPDATE:END -->
