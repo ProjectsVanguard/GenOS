@@ -8,7 +8,7 @@
 #define VFS_PATH_MAX 192
 #define VFS_DIRECTORY 1u
 #define VFS_REGULAR 2u
-typedef struct { char name[VFS_NAME_MAX]; uint8_t type; const uint8_t *data; size_t size; } vfs_node_t;
+typedef struct { char name[VFS_PATH_MAX]; uint8_t type; const uint8_t *data; size_t size; } vfs_node_t;
 typedef struct { vfs_node_t nodes[VFS_MAX_NODES]; size_t count; } vfs_t;
 typedef struct { const vfs_node_t *node; size_t offset; } vfs_handle_t;
 /* Initramfs is immutable: mount copies metadata, not file payloads. */
