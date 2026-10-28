@@ -47,10 +47,10 @@ C:\\GenOS&gt; _</font></pre>
 |---|---|
 | AMD64 / x86-64 | Arquitetura do kernel atual; alvo de build das ISOs V3. |
 | BIOS legado (AMD64) | Teste de inicialização automatizado no QEMU. |
-| UEFI x86-64 | A ISO inclui suporte de boot UEFI; o workflow agora também executa um smoke test UEFI no QEMU. Aguarde a execução ficar verde para considerar esse teste confirmado. |
+| UEFI x86-64 | Smoke test de inicialização aprovado no QEMU no workflow V3 concluído com sucesso; ainda não validado em hardware físico. |
 | ARM / AArch64 | **Ainda não suportado pelo kernel.** Exige port de arquitetura, linker/entrada de kernel, acesso a serial/console e uma imagem/boot chain próprios; uma ISO AMD64 não inicializa em ARM. |
 
-> AMD64 é o nome da arquitetura x86-64 e não significa apenas processadores AMD: CPUs Intel 64 também pertencem a essa família. BIOS e UEFI são modos de firmware, não arquiteturas de CPU. A inclusão do teste UEFI ainda precisa passar no GitHub Actions; não representa validação em hardware físico.
+ > AMD64 é o nome da arquitetura x86-64 e não significa apenas processadores AMD: CPUs Intel 64 também pertencem a essa família. BIOS e UEFI são modos de firmware, não arquiteturas de CPU. O smoke test UEFI foi aprovado no QEMU; isso não representa validação em hardware físico.
 
 ## Downloads das edições GenOS
 
@@ -62,7 +62,7 @@ C:\\GenOS&gt; _</font></pre>
 
 Os botões abrem a página da **release mais recente**, onde você pode baixar os arquivos que já foram publicados. Os links diretos para arquivos V3 retornavam “página não encontrada” porque esses nomes ainda não estão disponíveis em uma release. Depois que o build V3 publicar as três ISOs, os links diretos poderão ser ativados com os nomes confirmados dos arquivos.
 
-> **GenOS V3:** o workflow [Build GenOS V3 edition ISOs](https://github.com/ProjectsVanguard/GenOS/actions/workflows/build-iso-v3.yml) agora prepara ISOs separadas para Home, Ultimate e Enterprise LTSC, executa testes de compilação/pacotes e smoke tests de boot BIOS e UEFI no QEMU. A release só é publicada se as três variantes passarem. O teste de UEFI precisa passar no workflow atualizado; ARM/AArch64 continua sem suporte. As edições compartilham o mesmo kernel e payload; os nomes identificam perfis experimentais, não conjuntos de recursos distintos. Enterprise LTSC não implica garantia de suporte prolongado.
+ > **GenOS V3:** o workflow [Build GenOS V3 edition ISOs](https://github.com/ProjectsVanguard/GenOS/actions/workflows/build-iso-v3.yml) foi concluído com sucesso na [execução 40709805588](https://github.com/ProjectsVanguard/GenOS/actions/runs/40709805588). As três variantes — Home, Ultimate e Enterprise LTSC — passaram pela compilação, testes de pacotes, verificações de integração da GenUI e smoke tests BIOS/UEFI no QEMU. A publicação depende de todas as variantes passarem. ARM/AArch64 continua sem suporte. As edições compartilham o mesmo kernel e payload; os nomes identificam perfis experimentais, não conjuntos de recursos distintos. Enterprise LTSC não implica garantia de suporte prolongado.
 
 [Ver todas as releases e downloads](https://github.com/ProjectsVanguard/GenOS/releases)
 
@@ -87,15 +87,15 @@ O GitHub Actions tenta construir automaticamente uma ISO híbrida BIOS/UEFI a ca
 
 Também é possível iniciar uma compilação manual em **Actions → Build GenOS test ISO → Run workflow**.
 
-A imagem deve ser considerada uma **ISO de teste experimental**. O fluxo compila o GenKernel, gera a ISO com Limine e verifica o arquivo/checksum. A conclusão do build não substitui um teste visual em QEMU/VirtualBox e em hardware real. Teste primeiro em máquina virtual. A ISO não instala o GenOS nem deve ser usada para particionar o disco interno.
+A imagem deve ser considerada uma **ISO de teste experimental**. O fluxo compila o GenKernel, gera a ISO com Limine e verifica o arquivo/checksum. A conclusão do build não substitui um teste visual completo em QEMU/VirtualBox e em hardware real. Teste primeiro em máquina virtual. A ISO não instala o GenOS nem deve ser usada para particionar o disco interno.
 
 ## Estado atual
 
-- O kernel C freestanding para x86-64 solicita framebuffer ao Limine e desenha uma tela de demonstração.
+- O kernel C freestanding para x86-64 solicita framebuffer ao Limine e desenha uma tela experimental. O protótipo de GenUI inclui menu com navegação por teclado PS/2 em polling; a interação ainda precisa de validação visual/runtime dedicada no QEMU e não é uma interface completa.
 - Existe uma proposta de aplicativos iniciais em C para framebuffer/teclado legado na [PR de runtime nativo](https://github.com/ProjectsVanguard/GenOS/pull/2). Enquanto a PR não for integrada e o build/teste não passar, não considere esses aplicativos parte da versão estável.
 - A ferramenta Python cria, valida e instala pacotes `.gem` experimentais.
 - A suíte GenOS Suite reúne os protótipos web em um único pacote `.gem`; esses apps usam runtime web e não são executados nativamente pelo kernel.
-- O build automatizado gera imagens para teste; compatibilidade com cada computador ainda precisa ser verificada.
+- O workflow V3 [passou na execução 40709805588](https://github.com/ProjectsVanguard/GenOS/actions/runs/40709805588), incluindo smoke tests de inicialização BIOS e UEFI no QEMU para as três edições. Compatibilidade com computadores físicos ainda precisa ser verificada.
 
 ## Requisitos para build local
 
