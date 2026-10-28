@@ -13,7 +13,8 @@ typedef struct { vfs_node_t nodes[VFS_MAX_NODES]; size_t count; } vfs_t;
 typedef struct { const vfs_node_t *node; size_t offset; } vfs_handle_t;
 /* Initramfs is immutable: mount copies metadata, not file payloads. */
 int vfs_init(vfs_t *fs);
-int vfs_mkdir(vfs_t *fs, const char *absolute_path);\nint vfs_add_file(vfs_t *fs, const char *absolute_path, const void *data, size_t size);
+int vfs_mkdir(vfs_t *fs, const char *absolute_path);
+int vfs_add_file(vfs_t *fs, const char *absolute_path, const void *data, size_t size);
 int vfs_stat(const vfs_t *fs, const char *absolute_path, vfs_node_t *out);
 int vfs_open(const vfs_t *fs, const char *absolute_path, vfs_handle_t *out);
 size_t vfs_read(vfs_handle_t *handle, void *dst, size_t capacity);
