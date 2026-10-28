@@ -21,8 +21,42 @@ static const uint8_t font[][5] = {
 };
 static void text(int x,int y,const char*s,uint32_t c,int scale){ for(;*s;s++,x+=6*scale)for(int col=0;col<5;col++)for(int row=0;row<7;row++){char ch=*s;int idx=(ch>='A'&&ch<='Z')?ch-'A':(ch>='0'&&ch<='9')?42+ch-'0':ch==' '?26:ch=='.'?40:ch==':'?29:ch=='-'?38:ch=='!'?27:ch=='/'?41:26; if(idx>=0&&idx<(int)(sizeof(font)/sizeof(font[0]))&&(font[idx][col]&(1<<row)))rect(x+col*scale,y+row*scale,scale,scale,c);}}
 static void desktop(void){ if(!fb)return; rect(0,0,width,height,color(14,22,42)); for(uint32_t y=0;y<height*2/3;y++){uint8_t b=60+(uint8_t)(y*50/(height?height:1));rect(0,y,width,1,color(16,30,b));} rect(0,height-42,width,42,color(18,24,39)); rect(16,height-34,120,26,color(47,91,166)); text(28,height-26,"GENOS MENU",color(255,255,255),2); rect(width/2-190,height/2-100,380,200,color(30,41,63)); rect(width/2-190,height/2-100,380,3,color(83,160,255)); text(width/2-160,height/2-75,"GENOS DEVELOPER PREVIEW",color(255,255,255),2); text(width/2-160,height/2-25,"GENKERNEL BOOTED",color(115,220,170),2); text(width/2-160,height/2+15,"GENUI FRAMEBUFFER SHELL",color(220,230,245),2); text(width/2-160,height/2+55,"GEM APPS: USE SDK ON HOST",color(220,230,245),1); }
+/* Early native UI prototype: PS/2 keyboard polling in QEMU/legacy environments.
+ * No IRQ controller, USB HID, processes or filesystem is implied here. */
+static uint8_t io_in8(uint16_t port){
+    uint8_t value;
+    __asm__ volatile("inb %1,%0":"=a"(value):"Nd"(port));
+    return value;
+}
+static void native_panel(uint8_t open){
+    if(!fb)return;
+    desktop();
+    if(open){
+        int x=(int)width/2-170, y=(int)height/2-90;
+        rect(x,y,340,180,color(23,34,54));
+        rect(x,y,340,4,color(115,220,170));
+        text(x+20,y+22,"GENOS NATIVE MENU",color(255,255,255),2);
+        text(x+20,y+72,"ENTER: TOGGLE MENU",color(200,220,245),1);
+        text(x+20,y+94,"ESC: CLOSE MENU",color(200,220,245),1);
+        text(x+20,y+126,"KEYBOARD: PS/2 POLLING",color(115,220,170),1);
+    }
+    text(18,18,"GENOS / GENKERNEL 0.1",color(255,255,255),2);
+    text(18,42,"EXPERIMENTAL KERNEL - NATIVE UI PROTOTYPE",color(230,230,245),1);
+}
+static void keyboard_poll_loop(void){
+    uint8_t menu_open=0;
+    for(;;){
+        /* Read only when the PS/2 controller reports output available. */
+        if(io_in8(0x64)&1U){
+            uint8_t scancode=io_in8(0x60);
+            if(scancode==0x1cU){menu_open^=1U;native_panel(menu_open);}
+            else if(scancode==0x01U && menu_open){menu_open=0;native_panel(menu_open);}
+        }
+        __asm__ volatile("pause");
+    }
+}
 static void serial_init(void){ __asm__ volatile("outb %0,%1"::"a"((uint8_t)0x00),"Nd"((uint16_t)0x3F9)); __asm__ volatile("outb %0,%1"::"a"((uint8_t)0x80),"Nd"((uint16_t)0x3FB)); __asm__ volatile("outb %0,%1"::"a"((uint8_t)0x03),"Nd"((uint16_t)0x3F8)); __asm__ volatile("outb %0,%1"::"a"((uint8_t)0x00),"Nd"((uint16_t)0x3F9)); __asm__ volatile("outb %0,%1"::"a"((uint8_t)0x03),"Nd"((uint16_t)0x3FB)); __asm__ volatile("outb %0,%1"::"a"((uint8_t)0xC7),"Nd"((uint16_t)0x3FA)); __asm__ volatile("outb %0,%1"::"a"((uint8_t)0x0B),"Nd"((uint16_t)0x3FC)); }
 static void serial_text(const char *s){ for(;*s;s++){ for(unsigned int i=0;i<1000000;i++){ uint8_t v; __asm__ volatile("inb %1,%0":"=a"(v):"Nd"((uint16_t)0x3FD)); if(v&0x20)break; } __asm__ volatile("outb %0,%1"::"a"((uint8_t)*s),"Nd"((uint16_t)0x3F8)); } }
 static void halt(void){ for(;;)__asm__ volatile("hlt"); }
-void genkernel_main(void){ serial_init(); serial_text("GENKERNEL ENTRY\\r\\n"); if(!LIMINE_BASE_REVISION_SUPPORTED){serial_text("LIMINE BASE REVISION UNSUPPORTED\\r\\n");halt();} if(!fb_req.response||!fb_req.response->framebuffer_count){serial_text("FRAMEBUFFER RESPONSE MISSING\\r\\n");halt();} fb=fb_req.response->framebuffers[0]; if(!fb||!fb->address||fb->bpp!=32||fb->width==0||fb->height==0||fb->width>8192||fb->height>8192||fb->pitch<fb->width*4U||(fb->pitch&3U)!=0){serial_text("SECURITY CHECK FAILED: INVALID FRAMEBUFFER\\r\\n");halt();} width=fb->width;height=fb->height;stride=fb->pitch/4;pixels=(volatile uint32_t*)fb->address; desktop(); serial_text("GENKERNEL BOOTED\\r\\n"); text(18,18,"GENOS / GENKERNEL 0.1",color(255,255,255),2); text(18,42,"EXPERIMENTAL KERNEL - FRAMEBUFFER ONLY",color(230,230,245),1); halt(); }
+void genkernel_main(void){ serial_init(); serial_text("GENKERNEL ENTRY\\r\\n"); if(!LIMINE_BASE_REVISION_SUPPORTED){serial_text("LIMINE BASE REVISION UNSUPPORTED\\r\\n");halt();} if(!fb_req.response||!fb_req.response->framebuffer_count){serial_text("FRAMEBUFFER RESPONSE MISSING\\r\\n");halt();} fb=fb_req.response->framebuffers[0]; if(!fb||!fb->address||fb->bpp!=32||fb->width==0||fb->height==0||fb->width>8192||fb->height>8192||fb->pitch<fb->width*4U||(fb->pitch&3U)!=0){serial_text("SECURITY CHECK FAILED: INVALID FRAMEBUFFER\\r\\n");halt();} width=fb->width;height=fb->height;stride=fb->pitch/4;pixels=(volatile uint32_t*)fb->address; native_panel(0); serial_text("GENKERNEL BOOTED\\r\\n"); keyboard_poll_loop(); }
 void _start(void){ genkernel_main(); }
