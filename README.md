@@ -149,5 +149,5 @@ Ainda faltam componentes fundamentais de um sistema operacional de uso geral, in
 A seção abaixo é atualizada automaticamente pelo GitHub Actions quando alterações relevantes são enviadas para `main`. Para mudanças funcionais, atualize também manualmente as seções de estado, build e limitações, para que a documentação descreva o comportamento real — não apenas a existência de um commit.
 
 <!-- README-AUTO-UPDATE:START -->
-- Última atualização automática: 2026-10-28T12:03:06-03:00 UTC — commit [`b672d59`](https://github.com/ProjectsVanguard/GenOS/commit/b672d596a835e82fa8fc8ef72dc5161aa142f170) — Run ISO CI when boot workflow or native subsystem tests change
+- Última atualização automática: 2026-10-28T12:14:23-03:00 UTC — commit [`554d305`](https://github.com/ProjectsVanguard/GenOS/commit/554d305739ac66f567c39938384f02d5c53c2818) — Add read-only FAT32 parser and host tests
 <!-- README-AUTO-UPDATE:END -->
