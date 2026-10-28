@@ -22,7 +22,7 @@ build/org.genos.suite.gem: FORCE apps/genos-suite/index.html tools/gem/build_sui
 build/org.genos.app-store.gem: FORCE apps/app-store/index.html apps/app-store/manifest.json tools/gem/genpkg.py | build
 	python3 tools/gem/genpkg.py pack apps/app-store -o $@
 subsystem-test: | build
-	$(CC) -std=c11 -O2 -Wall -Wextra -Werror -I. tests/test_subsystems.c kernel/subsystems/vfs.c kernel/subsystems/net_parse.c kernel/subsystems/usb_desc.c genui/genui3.c -o build/test_subsystems
+	$(CC) -std=c11 -O2 -Wall -Wextra -Werror -I. tests/test_subsystems.c kernel/subsystems/vfs.c kernel/subsystems/fat32.c kernel/subsystems/net_parse.c kernel/subsystems/usb_desc.c genui/genui3.c -o build/test_subsystems
 	./build/test_subsystems
 	$(CC) -std=c11 -O2 -Wall -Wextra -Werror -I. tests/test_fat32.c kernel/subsystems/fat32.c kernel/subsystems/vfs.c -o build/test_fat32
 	./build/test_fat32
