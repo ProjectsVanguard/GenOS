@@ -2,6 +2,7 @@
 #define GENOS_VFS_H
 #include <stddef.h>
 #include <stdint.h>
+#include "fat32.h"
 #define VFS_MAX_NODES 64
 #define VFS_NAME_MAX 48
 #define VFS_FILE_MAX 4096
@@ -20,4 +21,8 @@ int vfs_open(const vfs_t *fs, const char *absolute_path, vfs_handle_t *out);
 size_t vfs_read(vfs_handle_t *handle, void *dst, size_t capacity);
 int vfs_list(const vfs_t *fs, const char *directory, size_t index, vfs_node_t *out);
 int initramfs_mount(vfs_t *fs, const void *image, size_t image_size);
+/* Imports one FAT32 root file into VFS. storage must outlive the VFS entry. */
+int vfs_import_fat32_root_file(vfs_t *fs, const fat32_volume_t *volume,
+                               const char *short_name, const char *vfs_path,
+                               void *storage, size_t storage_capacity);
 #endif
