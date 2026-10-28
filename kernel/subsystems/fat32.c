@@ -61,12 +61,19 @@ int fat32_find_root(const fat32_volume_t*v,const char*want,fat32_entry_t*out){
     }return -1;
 }
 int fat32_read_file(const fat32_volume_t*v,const fat32_entry_t*e,void*dst,size_t cap,size_t*read_out){
-    if(read_out)*read_out=0;if(!v||!e||!read_out||(!dst&&e->size)||(e->attributes&0x10)||e->size>cap)return -1;
-    if(!e->size)return 0;uint8_t*d=(uint8_t*)dst;size_t copied=0;uint32_t c=e->first_cluster;
+    if(read_out) *read_out=0;
+    if(!v||!e||!read_out||(!dst&&e->size)||(e->attributes&0x10)||e->size>cap) return -1;
+    if(!e->size) return 0;
+    uint8_t*d=(uint8_t*)dst;size_t copied=0;uint32_t c=e->first_cluster;
     for(uint32_t steps=0;steps<v->cluster_count&&copied<e->size;steps++){
         uint32_t first;if(cluster_sector(v,c,&first))return -1;
         for(uint32_t si=0;si<v->sectors_per_cluster&&copied<e->size;si++){const uint8_t*p;if(sector(v,first+si,&p))return -1;size_t n=e->size-copied;if(n>512)n=512;for(size_t i=0;i<n;i++)d[copied+i]=p[i];copied+=n;}
-        if(copied==e->size)break;uint32_t next;if(next_cluster(v,c,&next)||!next)return -1;c=next;
+        if(copied==e->size) break;
+        uint32_t next;
+        if(next_cluster(v,c,&next)||!next) return -1;
+        c=next;
     }
-    if(copied!=e->size)return -1;*read_out=copied;return 0;
+    if(copied!=e->size) return -1;
+    *read_out=copied;
+    return 0;
 }
